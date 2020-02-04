@@ -14,7 +14,7 @@ public class View
 	    
 		public void printMenu()
 		{
-			System.out.println("1. Crear Arreglo Dinamico de Strings");
+			System.out.println("1. Cargar datos de los comparendos");
 			System.out.println("2. Agregar String");
 			System.out.println("3. Buscar String");
 			System.out.println("4. Eliminar String");
