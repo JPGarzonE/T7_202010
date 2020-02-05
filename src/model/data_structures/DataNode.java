@@ -16,16 +16,13 @@ public class DataNode<T>{
 		return previous;
 	}
 
-	public void setPrevious(DataNode<T> previous) {
-		this.previous = previous;
-	}
-
 	public DataNode<T> getNext() {
 		return next;
 	}
 
 	public void setNext(DataNode<T> next) {
 		this.next = next;
+		next.previous = this;
 	}
 
 	public T getNodeInfo() {

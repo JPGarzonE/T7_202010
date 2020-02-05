@@ -13,7 +13,7 @@ public class TestModelo {
 	
 	@Before
 	public void setUp1() {
-		modelo= new Modelo(CAPACIDAD);
+		modelo= new Modelo();
 	}
 
 	public void setUp2() {

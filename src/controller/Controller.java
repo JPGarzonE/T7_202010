@@ -2,6 +2,7 @@ package controller;
 
 import java.util.Scanner;
 
+import model.logic.Feature;
 import model.logic.Modelo;
 import view.View;
 
@@ -27,7 +28,6 @@ public class Controller {
 	{
 		Scanner lector = new Scanner(System.in);
 		boolean fin = false;
-		String dato = "";
 		String respuesta = "";
 
 		while( !fin ){
@@ -37,55 +37,22 @@ public class Controller {
 			switch(option){
 				case 1:
 					view.printMessage("--------- \nCargando datos de comparendos...");
-				    modelo = new Modelo(2);
-				    view.printMessage("Datos Cargados:");
+				    modelo = new Modelo();
+				    modelo.loadDataList("./data/comparendos_dei_2018_small.geojson");
+				    Feature firstFeature = modelo.getFirstFeature();
+				    Feature lastFeature = modelo.getLastFeature();
+				    int featuresNumber = modelo.getFeaturesSize();
+				    view.printGeneralFeaturesInfo(firstFeature, lastFeature, featuresNumber);
 					break;
 
 				case 2:
-					view.printMessage("--------- \nDar cadena (simple) a ingresar: ");
-					dato = lector.next();
-					modelo.agregar(dato);
-					view.printMessage("Dato agregado");
-					view.printMessage("Numero actual de elementos " + modelo.darTamano() + "\n---------");						
+					view.printMessage("--------- \nNumero de ID: ");
+					int dato = Integer.parseInt( lector.next() );
+					Feature featureFounded = modelo.buscar(dato);
+					view.printFeature( featureFounded );				
 					break;
-
-				case 3:
-					view.printMessage("--------- \nDar cadena (simple) a buscar: ");
-					dato = lector.next();
-					respuesta = modelo.buscar(dato);
-					if ( respuesta != null)
-					{
-						view.printMessage("Dato encontrado: "+ respuesta);
-					}
-					else
-					{
-						view.printMessage("Dato NO encontrado");
-					}
-					view.printMessage("Numero actual de elementos " + modelo.darTamano() + "\n---------");						
-					break;
-
-				case 4:
-					view.printMessage("--------- \nDar cadena (simple) a eliminar: ");
-					dato = lector.next();
-					respuesta = modelo.eliminar(dato);
-					if ( respuesta != null)
-					{
-						view.printMessage("Dato eliminado "+ respuesta);
-					}
-					else
-					{
-						view.printMessage("Dato NO eliminado");							
-					}
-					view.printMessage("Numero actual de elementos " + modelo.darTamano() + "\n---------");						
-					break;
-
-				case 5: 
-					view.printMessage("--------- \nContenido del Arreglo: ");
-					view.printModelo(modelo);
-					view.printMessage("Numero actual de elementos " + modelo.darTamano() + "\n---------");						
-					break;	
 					
-				case 6: 
+				case 3: 
 					view.printMessage("--------- \n Hasta pronto !! \n---------"); 
 					lector.close();
 					fin = true;

@@ -1,14 +1,12 @@
 package model.data_structures;
 
+import java.util.ArrayList;
+
 public class DataList<T> implements IDataList<T> {
 
 	private DataNode<T> firstNode;
 	
 	private DataNode<T> lastNode;
-	
-	public DataNode<T> getNode(int objectId) {
-		return null;
-	}
 	
 	public int getSize(){
 		
@@ -27,14 +25,17 @@ public class DataList<T> implements IDataList<T> {
 		return size;
 	}
 
-	public void addNode(DataNode<T> node) {
+	public void addNode(T nodeInfo) {
+		
+		DataNode<T> node = new DataNode<T>(nodeInfo);
+				
 		if( lastNode != null ) {
 			lastNode.setNext(node);
 			lastNode = node;
 		
 		}else if( firstNode != null ){
-			firstNode.setNext(node);
 			lastNode = node;
+			firstNode.setNext(lastNode);
 		}else{
 			firstNode = node;
 		}
@@ -44,16 +45,8 @@ public class DataList<T> implements IDataList<T> {
 		return firstNode;
 	}
 
-	public void setFirstNode(DataNode<T> firstNode) {
-		this.firstNode = firstNode;
-	}
-
 	public DataNode<T> getLastNode() {
 		return lastNode;
-	}
-
-	public void setLastNode(DataNode<T> lastNode) {
-		this.lastNode = lastNode;
 	}
 	
 }
