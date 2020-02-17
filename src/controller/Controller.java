@@ -14,7 +14,7 @@ public class Controller {
 	/* Instancia de la Vista*/
 	private View view;
 	
-	Static final String DATA_PATH = "./data/comparendos_dei_2018.geojson";
+	static final String DATA_PATH = "./data/comparendos_dei_2018_small.geojson";
 	
 	/**
 	 * Crear la vista y el modelo del proyecto
@@ -41,10 +41,10 @@ public class Controller {
 					view.printMessage("--------- \nCargando datos de comparendos...");
 				    modelo = new Modelo();
 				    modelo.loadDataList(DATA_PATH);
-				    Feature firstFeature = modelo.getFirstFeature();
-				    Feature lastFeature = modelo.getLastFeature();
 				    int featuresNumber = modelo.getFeaturesSize();
-				    view.printGeneralFeaturesInfo(firstFeature, lastFeature, featuresNumber);
+				    Feature biggestIdFeature = modelo.getFeatureWithBiggestId();
+				    double[] minmax = modelo.getMinmax();
+				    view.printGeneralFeaturesInfo(featuresNumber, biggestIdFeature, minmax);
 					break;
 
 				case 2:

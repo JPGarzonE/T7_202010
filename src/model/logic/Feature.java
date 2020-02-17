@@ -11,7 +11,7 @@ public class Feature {
 	private Geometry featureGeometry;
 	
 	public Feature(String type,  int objectId, String date, String detectionMethod, String vehicleClass,
-			String serviceType, String infraction, String reason, String locality, String geomType, ArrayList<Integer> coordinates){
+			String serviceType, String infraction, String reason, String locality, String geomType, ArrayList<Double> coordinates){
 	
 		featureProperties = new Property(objectId, date, detectionMethod, vehicleClass, 
 				serviceType, infraction, reason, locality);
@@ -29,7 +29,7 @@ public class Feature {
 		return featureGeometry.type;
 	}
 
-	public ArrayList<Integer> getCoordinates() {
+	public ArrayList<Double> getCoordinates() {
 		return featureGeometry.coordinates;
 	}
 

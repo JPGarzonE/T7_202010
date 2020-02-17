@@ -23,7 +23,7 @@ public class TestDataList {
 	{
 		setUp1();
 		
-		assertTrue("El precio debe ser mayor a cero", dataList.getSize()>0 );
+		assertTrue("El tamaño debe ser mayor a cero", dataList.getSize()>0 );
 		assertEquals( "El tamaño debería ser 150", 150, dataList.getSize() );
 	}
 

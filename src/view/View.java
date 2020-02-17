@@ -1,5 +1,7 @@
 package view;
 
+import java.text.DecimalFormat;
+
 import model.logic.Feature;
 import model.logic.Modelo;
 
@@ -44,24 +46,67 @@ public class View
 			
 		}
 		
-		public void printGeneralFeaturesInfo( Feature firstFeature, Feature lastFeature, int featuresNumber ){
+		public void printGeneralFeaturesInfo(int featuresNumber, Feature featureBiggestId, double[] minmax ){
 			
 			System.out.println("\nDATOS GENERALES:");
-			System.out.println("\n-----------------------------------\n\n");
-			
-			System.out.println("\nPRIMER COMPARENDO:");
-			printFeature(firstFeature);
-			
-			System.out.println("\nULTIMO COMPARENDO:");
-			printFeature(lastFeature);
+			System.out.println("\n-----------------------------------");
 			
 			System.out.println("\nNUMERO TOTAL DE COMPARENDOS: " + featuresNumber);
-			System.out.println("\n");
+			
+			System.out.println("\n\nCOMPARENDO CON MAYOR ID:");
+			printFeature(featureBiggestId);
+			
+			System.out.println("\nMINMAX DE LOS COMPARENDOS:\n");
+			printMinimax(minmax);
 			
 		}
 		
-		public void printModelo(Modelo modelo)
-		{
-			// TODO implementar
+		public void printMinimax( double[] minmax ){
+			
+			int altoRect = 10;
+			int anchoRect = 20;
+			
+			DecimalFormat format = new DecimalFormat("#.##");
+			
+			String maxlat = format.format(minmax[2]);
+			String maxlong = format.format(minmax[3]);
+			String minlat = format.format(minmax[0]);
+			String minlong = format.format(minmax[1]);
+			
+			System.out.println("MaxLat (" + maxlat + ")");
+			System.out.println("MaxLong (" + maxlong + ")");
+
+			System.out.println("minLat (" + minlat + ")");
+			System.out.println("minLong (" + minlong + ")\n");
+			
+			for(int i = 0; i < altoRect ; i++){
+	            
+				String linea = "";
+				
+				for(int j = 0; j < anchoRect ; j++){
+					
+					if( i == 0 && j == 0 )
+						linea += (maxlat);
+					else if( i == 0 && j == anchoRect - 1)
+						linea += (maxlong);
+					else if( i == altoRect - 1 && j == 0 )
+						linea += (minlat);
+					else if( i == altoRect - 1 && j == anchoRect - 1 )
+						linea += (minlong);
+					else if( i == 0 || i == altoRect - 1 || j == 0 || j == anchoRect - 1){
+						if(  j == anchoRect - 1  ){
+							linea += "        * ";
+						}else{
+							linea += "* ";
+						}
+					}else
+						linea += "  ";
+			    }
+				
+				System.out.println(linea);
+			 }
+			
+			System.out.println("\n\n");
+			
 		}
 }
