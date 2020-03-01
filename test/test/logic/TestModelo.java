@@ -55,7 +55,7 @@ public class TestModelo {
 		setUp1();
 		// TODO Completar la prueba
 		try {
-			modelo.buscar(dato.getObjectId());
+			modelo.searchFeature(dato.getObjectId());
 			
 		}
 		catch (Exception e1)
@@ -89,26 +89,6 @@ public class TestModelo {
         catch( Exception e2 )
         {
             fail( "Hay un dato antes" );
-        }
-	}
-	
-	public void getLastFeature(){
-		setUp1();
-		try
-        {
-            modelo.getLastFeature();
-            fail( "No debería un dato" );
-        }
-        catch( Exception e1 ){
-        }
-
-        try
-        {
-            assertNull( "No deberia haber ningun dato despues",modelo.getLastFeature());
-        }
-        catch( Exception e2 )
-        {
-            fail( "Hay un dato despues" );
         }
 	}
 }

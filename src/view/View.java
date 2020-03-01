@@ -1,6 +1,8 @@
 package view;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Map;
 
 import model.logic.Feature;
 import model.logic.Modelo;
@@ -17,9 +19,10 @@ public class View
 	    
 		public void printMenu()
 		{
-			System.out.println("1. Cargar datos de los comparendos");
-			System.out.println("2. Consultar comparendo");
-			System.out.println("3. Exit");
+			System.out.println("1. Buscar comparendos por fecha");
+			System.out.println("2. Comparar comparendos por fechas");
+			System.out.println("3. Consultar comparendo");
+			System.out.println("4. Exit");
 			System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
 		}
 
@@ -109,4 +112,27 @@ public class View
 			System.out.println("\n\n");
 			
 		}
+		
+		public void printFeatures( ArrayList<Feature> features ){
+			for(int i = 0; i < features.size(); i++)
+				printFeature(features.get(i));
+		}
+		
+		public void printFeaturesComparatedByDate( String date1, String date2, Map<String, Integer> dates1, 
+				Map<String, Integer> dates2){
+			
+			printMessage("Infracción	|	" + date1 + "	|	" + date2);
+			
+			dates1.forEach( (key, val) -> {
+				boolean dates2ContainKey = dates2.containsKey(key);
+				int dates2Num = dates2ContainKey ? dates2.get(key) : 0;
+				printMessage(key + "		|		" + val + "	|	" + dates2Num);
+				if( dates2ContainKey ) dates2.remove(key);
+			});
+			
+			dates2.forEach( (key, val) -> {
+				printMessage(key + "		|		" + 0 + "	|	" + val);
+			});
+		}
+		
 }

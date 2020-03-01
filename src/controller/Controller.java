@@ -28,9 +28,11 @@ public class Controller {
 		
 	public void run() 
 	{
+
+		loadData();
+		
 		Scanner lector = new Scanner(System.in);
 		boolean fin = false;
-		String respuesta = "";
 
 		while( !fin ){
 			view.printMenu();
@@ -38,23 +40,32 @@ public class Controller {
 			int option = lector.nextInt();
 			switch(option){
 				case 1:
-					view.printMessage("--------- \nCargando datos de comparendos...");
-				    modelo = new Modelo();
-				    modelo.loadDataList(DATA_PATH);
-				    int featuresNumber = modelo.getFeaturesSize();
-				    Feature biggestIdFeature = modelo.getFeatureWithBiggestId();
-				    double[] minmax = modelo.getMinmax();
-				    view.printGeneralFeaturesInfo(featuresNumber, biggestIdFeature, minmax);
+					view.printMessage("--------- \nFecha: ");
+					String date = lector.next();
+					view.printFeatures( modelo.searchFeaturesByDate(date) );
 					break;
-
+					
 				case 2:
+					view.printMessage("--------- \nPrimera Fecha: ");
+					String date1 = lector.next();
+					view.printMessage("--------- \nSegunda Fecha: ");
+					String date2 = lector.next();
+					view.printFeaturesComparatedByDate(
+							date1,
+							date2,
+							modelo.searchFeaturesNumberByDate(date1),
+							modelo.searchFeaturesNumberByDate(date2)
+					);
+					break;
+					
+				case 3:
 					view.printMessage("--------- \nNumero de ID: ");
-					int dato = Integer.parseInt( lector.next() );
-					Feature featureFounded = modelo.buscar(dato);
+					int ID = Integer.parseInt( lector.next() );
+					Feature featureFounded = modelo.searchFeature(ID);
 					view.printFeature( featureFounded );				
 					break;
 					
-				case 3: 
+				case 4: 
 					view.printMessage("--------- \n Hasta pronto !! \n---------"); 
 					lector.close();
 					fin = true;
@@ -67,4 +78,15 @@ public class Controller {
 		}
 		
 	}	
+	
+	private void loadData(){
+		view.printMessage("--------- \nCargando datos de comparendos...");
+	    modelo = new Modelo();
+	    modelo.loadData(DATA_PATH);
+	    int featuresNumber = modelo.getFeaturesSize();
+	    Feature biggestIdFeature = modelo.getFeatureWithBiggestId();
+	    double[] minmax = modelo.getMinmax();
+	    view.printGeneralFeaturesInfo(featuresNumber, biggestIdFeature, minmax);
+	}
+	
 }

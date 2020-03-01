@@ -16,7 +16,7 @@ public class DataNode<T>{
 		return previous;
 	}
 
-	public DataNode<T> getNext() {
+	public DataNode<T> next() {
 		return next;
 	}
 

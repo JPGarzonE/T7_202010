@@ -2,7 +2,7 @@ package model.logic;
 
 import java.util.ArrayList;
 
-public class Feature {
+public class Feature implements Comparable<Feature> {
 
 	private String type;
 	
@@ -63,6 +63,16 @@ public class Feature {
 
 	public String getLocality() {
 		return featureProperties.locality;
+	}
+
+	public int compareTo(Feature feature) {
+		int comparation = getDate().compareTo( feature.getDate() );
+		
+		if( comparation == 0 )
+			if( getObjectId() != feature.getObjectId() )
+				comparation = getObjectId() > feature.getObjectId() ? 1 : -1;
+		
+		return comparation;
 	}
 	
 }
