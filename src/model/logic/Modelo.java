@@ -8,8 +8,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -195,6 +201,129 @@ public class Modelo {
 		}
 		
 		return featuresMatched;
+	}
+	
+	/**
+	 * Busca los N comparendos con más infracciones que estan entre dos fechas por parametro en una
+	 * localidad específica, si la localidad es null: se buscarán todas las localidades
+	 * @param dateBottom fecha inicial desde la que se van a buscar los comparendos
+	 * @param dateTop fecha final hasta donde se van a buscar los comparendos
+	 * @param locality localidad en la que se quiere buscar. null para buscar en todas las localidades
+	 * @param n numero de comparendos con más infracciones. si es null, se buscarán todos los comparendos
+	 * @return
+	 */
+	public Map<String, Integer> searchNfeaturesNumbersBetweenDatesInALocality(String dateBottom, String dateTop,
+			String locality, Integer n){
+		
+		ArrayList<Feature> featuresBetweenDates = binarySearchBetweenFeaturesDates(
+				featuresArray, dateBottom, dateTop, 0, featuresArray.length - 1);
+
+		Map<String, Integer> featuresBetweenDatesMap = new HashMap<>();
+		
+		Iterator<Feature> iterator = featuresBetweenDates.iterator();
+		
+		while( iterator.hasNext() ){
+			Feature featureIter = iterator.next();
+			String featureInfraction = featureIter.getInfraction();
+			
+			if( locality != null &&  featureIter.getLocality().equals(locality) ){
+				if( featuresBetweenDatesMap.containsKey(featureInfraction) )
+					featuresBetweenDatesMap.put(
+							featureInfraction, featuresBetweenDatesMap.get(featureInfraction)+1);
+				else
+					featuresBetweenDatesMap.put(
+							featureInfraction, 1);
+			}
+			else if( locality == null ){
+				if( featuresBetweenDatesMap.containsKey(featureInfraction) )
+					featuresBetweenDatesMap.put(
+							featureInfraction, featuresBetweenDatesMap.get(featureInfraction)+1);
+				else
+					featuresBetweenDatesMap.put(
+							featureInfraction, 1);
+			}
+
+		}
+		
+		if( n != null ){
+			Map<String, Integer> sortedFeaturesMap = sortByValue(featuresBetweenDatesMap);
+			featuresBetweenDatesMap.clear();
+			
+			int i = 1;
+			
+			for( Map.Entry<String, Integer> entry : sortedFeaturesMap.entrySet() ){
+				featuresBetweenDatesMap.put( entry.getKey(), entry.getValue() );
+				
+				if( i++ == n )
+					break;
+				
+			}
+			
+		}
+		
+		return featuresBetweenDatesMap;
+		
+	}
+	
+	private HashMap<String, Integer> sortByValue(Map<String, Integer> unSortedMap ){
+		HashMap<String, Integer> reverseSortedMap = new HashMap<>();
+		unSortedMap.entrySet()
+	    .stream()
+	    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) 
+	    .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
+		
+		return reverseSortedMap;
+	}
+	
+//	private static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+//        List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
+//        list.sort(Entry.comparingByValue(), Collections.reverseOrder());
+//
+//        Map<K, V> result = new LinkedHashMap<>();
+//        for (Entry<K, V> entry : list) {
+//            result.put(entry.getKey(), entry.getValue());
+//        }
+//
+//        return result;
+//    }
+	
+	private ArrayList<Feature> binarySearchBetweenFeaturesDates( Feature[] data, String dateBottom, String dateTop,
+			int idxBottom, int idxTop){
+		
+		ArrayList<Feature> featuresMatched = new ArrayList<Feature>();
+		
+		if( idxBottom > idxTop )
+			return featuresMatched;
+		
+		int idxMiddle = (idxTop + idxBottom) / 2;
+		
+		String middleDate = data[idxMiddle].getDate();
+
+		if( isInRange(middleDate, dateBottom, dateTop) ){
+			featuresMatched.add( data[idxMiddle] );
+			featuresMatched.addAll( 
+					binarySearchBetweenFeaturesDates(data, dateBottom, dateTop, idxBottom, idxMiddle-1)
+			);
+			featuresMatched.addAll(
+					binarySearchBetweenFeaturesDates(data, dateBottom, dateTop, idxMiddle+1, idxTop)
+			);
+		}
+		else if( middleDate.compareTo(dateTop) > 0 ){
+			featuresMatched.addAll(
+					binarySearchBetweenFeaturesDates(data, dateBottom, dateTop, idxBottom, idxMiddle-1 )
+			);
+		}
+		else if( middleDate.compareTo(dateBottom) < 0 ){
+			featuresMatched.addAll(
+					binarySearchBetweenFeaturesDates(data, dateBottom, dateTop, idxMiddle+1, idxTop)
+			);
+		}
+		
+		return featuresMatched;
+	}
+	
+	private <T extends Comparable<T>> boolean isInRange( T middleData, T bottomData, T topData ){
+		return (middleData.compareTo(bottomData) >= 0) && (middleData.compareTo(topData) <= 0);
 	}
 	
 	private void quickSort( Feature[] data, int lowIdx, int highIdx ){

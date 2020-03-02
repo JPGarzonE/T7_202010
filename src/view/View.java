@@ -19,10 +19,13 @@ public class View
 	    
 		public void printMenu()
 		{
-			System.out.println("1. Buscar comparendos por fecha");
-			System.out.println("2. Comparar comparendos por fechas");
-			System.out.println("3. Consultar comparendo");
-			System.out.println("4. Exit");
+			System.out.println("1. Consultar el primer comparendo de una localidad");
+			System.out.println("2. Buscar comparendos por fecha");
+			System.out.println("3. Comparar comparendos por dos fechas");
+			System.out.println("4. Buscar comparendos de una localidad entre dos fechas");
+			System.out.println("5. Buscar los N codigos de infracción con más infracciones entre dos fechas");
+			System.out.println("6. Consultar comparendo");
+			System.out.println("7. Exit");
 			System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
 		}
 
@@ -133,6 +136,20 @@ public class View
 			dates2.forEach( (key, val) -> {
 				printMessage(key + "		|		" + 0 + "	|	" + val);
 			});
+		}
+		
+		public void printFeaturesBetweenTwoDates( String initialDate, String finalDate, 
+				Map<String, Integer> features, String message ){
+			
+			printMessage(message + " del " + initialDate + " al " + finalDate);
+			
+			printMessage("Infracción	|	#Comparendos");
+			
+			features.forEach( (key, val) -> {
+				printMessage(key + "		|	" + val);
+			});
+			
+			printMessage("\n\n");
 		}
 		
 }

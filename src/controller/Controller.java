@@ -40,12 +40,18 @@ public class Controller {
 			int option = lector.nextInt();
 			switch(option){
 				case 1:
+					view.printMessage("--------- \nLocalidad: ");
+					String locality = lector.next();
+					view.printFeature( modelo.searchFirstFeatureByLocality(locality) );
+					break;
+					
+				case 2:
 					view.printMessage("--------- \nFecha: ");
 					String date = lector.next();
 					view.printFeatures( modelo.searchFeaturesByDate(date) );
 					break;
 					
-				case 2:
+				case 3:
 					view.printMessage("--------- \nPrimera Fecha: ");
 					String date1 = lector.next();
 					view.printMessage("--------- \nSegunda Fecha: ");
@@ -58,14 +64,42 @@ public class Controller {
 					);
 					break;
 					
-				case 3:
+				case 4:
+					view.printMessage("--------- \nLocalidad: ");
+					String localityToSearch = lector.next();
+					view.printMessage("--------- \nDesde (Fecha Inicial): ");
+					String initialDate = lector.next();
+					view.printMessage("--------- \nHasta (Fecha Final): ");
+					String finalDate = lector.next();
+					
+					view.printFeaturesBetweenTwoDates(initialDate, finalDate, 
+							modelo.searchNfeaturesNumbersBetweenDatesInALocality(
+									initialDate, finalDate, localityToSearch, null)
+							, "Comparación de comparendos en " + localityToSearch); 
+					break;
+					
+				case 5:
+					view.printMessage("--------- \nQuiero ver las (N) mayores infracciones: ");
+					int n = Integer.parseInt( lector.next() );
+					view.printMessage("--------- \nDesde (Fecha Inicial): ");
+					String initialDate2 = lector.next();
+					view.printMessage("--------- \nHasta (Fecha Final): ");
+					String finalDate2 = lector.next();
+					
+					view.printFeaturesBetweenTwoDates(initialDate2, finalDate2, 
+							modelo.searchNfeaturesNumbersBetweenDatesInALocality(
+									initialDate2, finalDate2, null, n)
+							, "Ranking de las " + n + " mayores infracciones ");
+					break;
+					
+				case 6:
 					view.printMessage("--------- \nNumero de ID: ");
 					int ID = Integer.parseInt( lector.next() );
 					Feature featureFounded = modelo.searchFeature(ID);
 					view.printFeature( featureFounded );				
 					break;
 					
-				case 4: 
+				case 7: 
 					view.printMessage("--------- \n Hasta pronto !! \n---------"); 
 					lector.close();
 					fin = true;
