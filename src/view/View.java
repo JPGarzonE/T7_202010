@@ -20,12 +20,16 @@ public class View
 		public void printMenu()
 		{
 			System.out.println("1. Consultar el primer comparendo de una localidad");
-			System.out.println("2. Buscar comparendos por fecha");
-			System.out.println("3. Comparar comparendos por dos fechas");
-			System.out.println("4. Buscar comparendos de una localidad entre dos fechas");
-			System.out.println("5. Buscar los N codigos de infracción con más infracciones entre dos fechas");
-			System.out.println("6. Consultar comparendo");
-			System.out.println("7. Exit");
+			System.out.println("2. Consultar el primer comparendo de una infracción");
+			System.out.println("3. Buscar comparendos por fecha");
+			System.out.println("4. Buscar comparendos por infracción");
+			System.out.println("5. Comparar comparendos por dos fechas");
+			System.out.println("6. Comparar comparendos por dos tipos de servicio");
+			System.out.println("7. Buscar comparendos de una localidad entre dos fechas");
+			System.out.println("8. Buscar los N codigos de infracción con más infracciones entre dos fechas");
+			System.out.println("9. Histograma Localidades");
+			System.out.println("10. Consultar comparendo");
+			System.out.println("11. Exit");
 			System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
 		}
 
@@ -138,6 +142,24 @@ public class View
 			});
 		}
 		
+		public void printFeaturesComparatedByServiceType( String particularType, String publicType, Map<String, Integer> particularT, 
+				Map<String, Integer> publicT){
+			
+			printMessage("Infracción	|	" + particularType + "	|	" + publicType);
+			
+			particularT.forEach( (key, val) -> {
+				boolean publicTContainKey = publicT.containsKey(key);
+				int publicTNum = publicTContainKey ? publicT.get(key) : 0;
+				printMessage(key + "		|		" + val + "	|	" + publicTNum);
+				if( publicTContainKey ) publicT.remove(key);
+			});
+			
+			publicT.forEach( (key, val) -> {
+				printMessage(key + "		|		" + 0 + "	|	" + val);
+			});
+		}
+		
+		
 		public void printFeaturesBetweenTwoDates( String initialDate, String finalDate, 
 				Map<String, Integer> features, String message ){
 			
@@ -152,4 +174,37 @@ public class View
 			printMessage("\n\n");
 		}
 		
+		
+		public void printHistogramL (String locality, Map<String, Integer>features)
+		{
+			printMessage ("Localidad		|			#Comparendos");
+			
+			features.forEach( (key, val) -> {
+				printMessage(key + "			|			" + val);
+			});
+			
+			printMessage("\n\n");
+		}
+		
+		public void printHistogramLocality (Map<String, Integer>features)
+		{
+			features.forEach((key, val) -> {
+				String resp = "";
+				for (int i = 0; i<val ; i++)
+				{
+					resp += "*";
+				}
+				System.out.println(key+"	|	"+resp);
+			});
+		}
+		
+		private ArrayList<Integer> number (int n)
+		{
+			ArrayList<Integer> numeros = new ArrayList<Integer>();
+			for (int i = 1; i<=n; i++)
+			{
+				numeros.add(n*i);
+			}
+			return numeros;
+		}
 }

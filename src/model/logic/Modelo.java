@@ -65,6 +65,11 @@ public class Modelo {
 	private Map<String, Feature> firstFeaturesLocalities;
 	
 	/**
+	 * Mapa que contiene los primeros comparendos del 
+	 * archivo por cada infraccion presente en el mismo
+	 */
+	private Map<String, Feature> firstFeaturesInfractions;
+	/**
 	 * 
 	 */
 	public Feature[] featuresArray;
@@ -77,6 +82,7 @@ public class Modelo {
 	{
 		queue = new Queue<Feature>();
 		firstFeaturesLocalities = new HashMap<String, Feature>();
+		firstFeaturesInfractions = new HashMap<String, Feature>();
 	}
 	
 	/**
@@ -127,20 +133,42 @@ public class Modelo {
 		return null;
 	}
 	
+	
 	/**
 	 * Busca el primer comparendo dada una localidad por parametro
 	 * @param locality. Localidad de donde es el comparendo que se va a buscar.
 	 * @return el comparendo si existe, si no null.
 	 */
+	//1A
 	public Feature searchFirstFeatureByLocality( String locality ){
 		
 		return firstFeaturesLocalities.get(locality);
 	}
 	
+	/**
+	 * Busca el primer comparendo dada una infraccion por parametro
+	 * @param infraction. Infraccion del comparendo que se va a buscar.
+	 * @return el comparendo si existe, si no null.
+	 */
+	//1B
+	public Feature searchFirstFeatureByInfraction (String infraction)
+	{
+		return firstFeaturesInfractions.get(infraction);
+	}
+	
+	//2A
 	public ArrayList<Feature> searchFeaturesByDate( String date ){
 		return binarySearchByFeaturesDate( featuresArray, date, 0, featuresArray.length - 1 );
 	}
 	
+	//2B
+	public ArrayList<Feature> searchFeaturesByInfraction (String infraction)
+	{
+		return binarySearchByFeaturesInfraction(featuresArray, infraction, 0, featuresArray.length - 1);
+	}
+	
+	
+	//3A
 	public Map<String, Integer> searchFeaturesNumberByDate( String date ){
 		ArrayList<Feature> featuresFounded = binarySearchByFeaturesDate(
 				featuresArray,
@@ -168,6 +196,58 @@ public class Modelo {
 		return featuresNumber;
 		
 	}
+	
+	
+	//3B
+	public Map<String, Integer> searchFeaturesNumberByServiceType( String serviceType ){
+		ArrayList<Feature> featuresFounded = binarySearchByFeaturesServiceType(
+				featuresArray,
+				serviceType, 
+				0, 
+				featuresArray.length-1
+		);
+		
+		Map<String, Integer> featuresNumber = new HashMap<>();
+		String actualInfraction = "";
+		
+		for( int i = 0; i < featuresFounded.size(); i++ ){
+			actualInfraction = featuresFounded.get(i).getInfraction();
+			if( featuresNumber.containsKey(actualInfraction) ){
+				featuresNumber.put(
+						actualInfraction,
+						featuresNumber.get(actualInfraction)+1
+				);
+			}
+			else{
+				featuresNumber.put( actualInfraction, 1 );
+			}
+		}
+		
+		return featuresNumber;
+		
+	}
+	
+	public Map<String, Integer> searchFeaturesNumberByLocality(){
+		
+		Map<String, Integer> featuresNumber = new HashMap<>();
+		String actualLocality = "";
+		
+		for( int i = 0; i<featuresArray.length;i++ )
+		{
+			actualLocality = featuresArray[i].getLocality();
+			if( featuresNumber.containsKey(actualLocality) )
+			{
+					featuresNumber.put(actualLocality,featuresNumber.get(actualLocality)+1);
+			}
+			else{
+				featuresNumber.put( actualLocality, 1 );
+			}
+		}
+		
+		return featuresNumber;
+		
+	}
+	
 	
 	private ArrayList<Feature> binarySearchByFeaturesDate( Feature[] data, String searchingDate, int idxBottom, int idxTop ){
 		
@@ -203,6 +283,117 @@ public class Modelo {
 		return featuresMatched;
 	}
 	
+	
+	
+	private ArrayList<Feature> binarySearchByFeaturesInfraction( Feature[] data, String searchingInfraction, int idxBottom, int idxTop )
+	{
+		
+		ArrayList<Feature> featuresMatched = new ArrayList<Feature>();
+		
+		if( idxBottom > idxTop )
+			return featuresMatched;
+		
+		int idxMiddle = (idxTop + idxBottom) / 2;
+		
+		String middleInfraction = data[idxMiddle].getInfraction();
+		
+		if( middleInfraction.equals( searchingInfraction ) ){
+			featuresMatched.add( data[idxMiddle] );
+			featuresMatched.addAll( 
+					binarySearchByFeaturesInfraction(data, searchingInfraction, idxBottom, idxMiddle-1)
+			);
+			featuresMatched.addAll(
+					binarySearchByFeaturesInfraction(data, searchingInfraction, idxMiddle+1, idxTop)
+			);
+		}
+		else if( middleInfraction.compareTo(searchingInfraction) < 0 ){
+			featuresMatched.addAll(
+					binarySearchByFeaturesInfraction(data, searchingInfraction, idxMiddle+1, idxTop)
+			);
+		}
+		else{
+			featuresMatched.addAll(
+					binarySearchByFeaturesInfraction(data, searchingInfraction, idxBottom, idxMiddle-1)
+			);
+		}
+		
+		return featuresMatched;
+	}
+	
+	
+	
+	private ArrayList<Feature> binarySearchByFeaturesServiceType( Feature[] data, String searchingType, int idxBottom, int idxTop )
+	{
+		
+		ArrayList<Feature> featuresMatched = new ArrayList<Feature>();
+		
+		if( idxBottom > idxTop )
+			return featuresMatched;
+		
+		int idxMiddle = (idxTop + idxBottom) / 2;
+		
+		String middle = data[idxMiddle].getServiceType();
+		
+		if( middle.equals( searchingType ) ){
+			featuresMatched.add( data[idxMiddle] );
+			featuresMatched.addAll( 
+					binarySearchByFeaturesServiceType(data, searchingType, idxBottom, idxMiddle-1)
+			);
+			featuresMatched.addAll(
+					binarySearchByFeaturesServiceType(data, searchingType, idxMiddle+1, idxTop)
+			);
+		}
+		else if( middle.compareTo(searchingType) < 0 ){
+			featuresMatched.addAll(
+					binarySearchByFeaturesServiceType(data, searchingType, idxMiddle+1, idxTop)
+			);
+		}
+		else{
+			featuresMatched.addAll(
+					binarySearchByFeaturesServiceType(data, searchingType, idxBottom, idxMiddle-1)
+			);
+		}
+		
+		return featuresMatched;
+	}
+	
+	
+	private ArrayList<Feature> binarySearchByFeaturesLocality( Feature[] data, String searchingType, int idxBottom, int idxTop )
+	{
+		
+		ArrayList<Feature> featuresMatched = new ArrayList<Feature>();
+		
+		if( idxBottom > idxTop )
+			return featuresMatched;
+		
+		int idxMiddle = (idxTop + idxBottom) / 2;
+		
+		String middle = data[idxMiddle].getLocality();
+		
+		if( middle.equals( searchingType ) ){
+			featuresMatched.add( data[idxMiddle] );
+			featuresMatched.addAll( 
+					binarySearchByFeaturesLocality(data, searchingType, idxBottom, idxMiddle-1)
+			);
+			featuresMatched.addAll(
+					binarySearchByFeaturesLocality(data, searchingType, idxMiddle+1, idxTop)
+			);
+		}
+		else if( middle.compareTo(searchingType) < 0 ){
+			featuresMatched.addAll(
+					binarySearchByFeaturesLocality(data, searchingType, idxMiddle+1, idxTop)
+			);
+		}
+		else{
+			featuresMatched.addAll(
+					binarySearchByFeaturesLocality(data, searchingType, idxBottom, idxMiddle-1)
+			);
+		}
+		
+		return featuresMatched;
+	}
+	
+	
 	/**
 	 * Busca los N comparendos con más infracciones que estan entre dos fechas por parametro en una
 	 * localidad específica, si la localidad es null: se buscarán todas las localidades
@@ -212,6 +403,7 @@ public class Modelo {
 	 * @param n numero de comparendos con más infracciones. si es null, se buscarán todos los comparendos
 	 * @return
 	 */
+	//1C
 	public Map<String, Integer> searchNfeaturesNumbersBetweenDatesInALocality(String dateBottom, String dateTop,
 			String locality, Integer n){
 		
@@ -265,6 +457,11 @@ public class Modelo {
 		
 	}
 	
+	
+	
+	
+	
+	
 	private HashMap<String, Integer> sortByValue(Map<String, Integer> unSortedMap ){
 		HashMap<String, Integer> reverseSortedMap = new HashMap<>();
 		unSortedMap.entrySet()
@@ -287,6 +484,7 @@ public class Modelo {
 //        return result;
 //    }
 	
+	//2C
 	private ArrayList<Feature> binarySearchBetweenFeaturesDates( Feature[] data, String dateBottom, String dateTop,
 			int idxBottom, int idxTop){
 		
@@ -321,6 +519,9 @@ public class Modelo {
 		
 		return featuresMatched;
 	}
+	
+	
+	
 	
 	private <T extends Comparable<T>> boolean isInRange( T middleData, T bottomData, T topData ){
 		return (middleData.compareTo(bottomData) >= 0) && (middleData.compareTo(topData) <= 0);
@@ -408,6 +609,8 @@ public class Modelo {
 				setMinMax(feature);
 				
 				loadFirstFeaturesByLocality(feature, feature.getLocality());
+				
+				loadFirstFeaturesByInfraction(feature, feature.getInfraction());
 			}			
 		}
 		catch(FileNotFoundException e){
@@ -458,6 +661,12 @@ public class Modelo {
 	private void loadFirstFeaturesByLocality(Feature feature, String locality){
 		if( !firstFeaturesLocalities.containsKey(locality) )
 			firstFeaturesLocalities.put(locality, feature);
+	}
+	
+	private void loadFirstFeaturesByInfraction(Feature feature, String infraction)
+	{
+		if( !firstFeaturesInfractions.containsKey(infraction) )
+			firstFeaturesInfractions.put(infraction, feature);
 	}
 	
 	private Feature loadFeature( JsonElement element ){

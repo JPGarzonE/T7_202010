@@ -46,12 +46,24 @@ public class Controller {
 					break;
 					
 				case 2:
+					view.printMessage("--------- \nInfracción: ");
+					String infractioni = lector.next();
+					view.printFeature( modelo.searchFirstFeatureByInfraction(infractioni) );
+					break;
+				
+				case 3:
 					view.printMessage("--------- \nFecha: ");
 					String date = lector.next();
 					view.printFeatures( modelo.searchFeaturesByDate(date) );
 					break;
 					
-				case 3:
+				case 4:
+					view.printMessage("--------- \nInfracción: ");
+					String infraction = lector.next();
+					view.printFeatures( modelo.searchFeaturesByInfraction(infraction) );
+					break;
+					
+				case 5:
 					view.printMessage("--------- \nPrimera Fecha: ");
 					String date1 = lector.next();
 					view.printMessage("--------- \nSegunda Fecha: ");
@@ -63,8 +75,22 @@ public class Controller {
 							modelo.searchFeaturesNumberByDate(date2)
 					);
 					break;
+				
+				case 6:
+					view.printMessage("--------- \nEscribir Particular: ");
+					String particularT = lector.next();
+					view.printMessage("--------- \nEscribir Publico: ");
+					String publicT = lector.next();
+					view.printFeaturesComparatedByServiceType(
+							particularT,
+							publicT,
+							modelo.searchFeaturesNumberByServiceType(particularT),
+							modelo.searchFeaturesNumberByServiceType(publicT)
+					);
+					break;
+				
 					
-				case 4:
+				case 7:
 					view.printMessage("--------- \nLocalidad: ");
 					String localityToSearch = lector.next();
 					view.printMessage("--------- \nDesde (Fecha Inicial): ");
@@ -78,7 +104,7 @@ public class Controller {
 							, "Comparación de comparendos en " + localityToSearch); 
 					break;
 					
-				case 5:
+				case 8:
 					view.printMessage("--------- \nQuiero ver las (N) mayores infracciones: ");
 					int n = Integer.parseInt( lector.next() );
 					view.printMessage("--------- \nDesde (Fecha Inicial): ");
@@ -91,15 +117,20 @@ public class Controller {
 									initialDate2, finalDate2, null, n)
 							, "Ranking de las " + n + " mayores infracciones ");
 					break;
+				
+				case 9:
+					view.printHistogramLocality(modelo.searchFeaturesNumberByLocality());
 					
-				case 6:
+					break;
+					
+				case 10:
 					view.printMessage("--------- \nNumero de ID: ");
 					int ID = Integer.parseInt( lector.next() );
 					Feature featureFounded = modelo.searchFeature(ID);
 					view.printFeature( featureFounded );				
 					break;
 					
-				case 7: 
+				case 11: 
 					view.printMessage("--------- \n Hasta pronto !! \n---------"); 
 					lector.close();
 					fin = true;
