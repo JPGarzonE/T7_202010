@@ -18,8 +18,10 @@ public class Property {
 	
 	public String locality;
 	
+	public String town;
+	
 	public Property( int objectId, String date, String detectionMethod, String vehicleClass,
-			String serviceType, String infraction, String reason, String locality ){
+			String serviceType, String infraction, String reason, String locality, String town ){
 		
 		this.objectId = objectId;
 		this.date = date;
@@ -29,6 +31,6 @@ public class Property {
 		this.infraction = infraction;
 		this.reason = reason;
 		this.locality = locality;
-		
+		this.town = town;
 	}
 }

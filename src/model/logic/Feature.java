@@ -11,10 +11,10 @@ public class Feature implements Comparable<Feature> {
 	private Geometry featureGeometry;
 	
 	public Feature(String type,  int objectId, String date, String detectionMethod, String vehicleClass,
-			String serviceType, String infraction, String reason, String locality, String geomType, ArrayList<Double> coordinates){
+			String serviceType, String infraction, String reason, String locality, String town, String geomType, ArrayList<Double> coordinates){
 	
 		featureProperties = new Property(objectId, date, detectionMethod, vehicleClass, 
-				serviceType, infraction, reason, locality);
+				serviceType, infraction, reason, locality, town);
 		
 		featureGeometry = new Geometry(geomType, coordinates);
 		
@@ -64,15 +64,23 @@ public class Feature implements Comparable<Feature> {
 	public String getLocality() {
 		return featureProperties.locality;
 	}
+	
+	public String getTown(){
+		return featureProperties.town;
+	}
 
-	public int compareTo(Feature feature) {
-		int comparation = getDate().compareTo( feature.getDate() );
+	public int compareTo(Feature compFeature) {
+		int comparation = getDate().compareTo(compFeature.getDate());
 		
 		if( comparation == 0 )
-			if( getObjectId() != feature.getObjectId() )
-				comparation = getObjectId() > feature.getObjectId() ? 1 : -1;
+			if( getObjectId() != compFeature.getObjectId() )
+				comparation = getObjectId() > compFeature.getObjectId() ? 1 : -1;
 		
 		return comparation;
+	}
+	
+	public String toString(){
+		return getObjectId()+"";
 	}
 	
 }
