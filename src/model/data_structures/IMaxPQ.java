@@ -1,8 +1,8 @@
 package model.data_structures;
 
-public interface IMaxPQ<Key extends Comparable<Key>, Val> {
+public interface IMaxPQ<Val> {
 
-	public void insert(Key k, Val v);
+	public void insert(Val v);
 	
 	public Val max();
 	

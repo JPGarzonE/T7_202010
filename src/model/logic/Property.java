@@ -12,6 +12,8 @@ public class Property {
 	
 	public String serviceType;
 	
+	public int serviceTypePriority;
+	
 	public String infraction;
 	
 	public String reason;
@@ -32,5 +34,12 @@ public class Property {
 		this.reason = reason;
 		this.locality = locality;
 		this.town = town;
+		
+		if( this.serviceType.equalsIgnoreCase("publico") )
+			this.serviceTypePriority = 10;
+		else if (this.serviceType.equalsIgnoreCase("oficial"))
+			this.serviceTypePriority = 5;
+		else if (this.serviceType.equalsIgnoreCase("particular"))
+			this.serviceTypePriority = 1;
 	}
 }

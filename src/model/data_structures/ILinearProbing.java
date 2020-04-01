@@ -1,5 +1,7 @@
 package model.data_structures;
 
+import java.util.Iterator;
+
 public interface ILinearProbing<Key extends Comparable<Key>, Value> {
 
 	public void put(Key key ,Value value);
@@ -7,9 +9,7 @@ public interface ILinearProbing<Key extends Comparable<Key>, Value> {
 	public void resize(int capacity);
 	
 	public Value[] get(Key key);
-	
-	public void delete(Key key);
-	
+		
 	public int size();
 	
 	public int hash(Key key);
@@ -18,6 +18,6 @@ public interface ILinearProbing<Key extends Comparable<Key>, Value> {
 	
 	public boolean contains(Key key);
 	
-	Iterable<Key> keys();
+	Iterator<Key> keys();
 	
 }

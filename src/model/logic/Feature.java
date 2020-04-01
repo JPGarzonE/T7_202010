@@ -52,6 +52,10 @@ public class Feature implements Comparable<Feature> {
 	public String getServiceType() {
 		return featureProperties.serviceType;
 	}
+	
+	public int getServiceTypePriority(){
+		return featureProperties.serviceTypePriority;
+	}
 
 	public String getInfraction() {
 		return featureProperties.infraction;
