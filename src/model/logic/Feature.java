@@ -33,6 +33,14 @@ public class Feature implements Comparable<Feature> {
 		return featureGeometry.coordinates;
 	}
 
+	public Double getLatitud(){
+		return featureGeometry.getLatitud();
+	}
+	
+	public Double getLongitud(){
+		return featureGeometry.getLongitud();
+	}
+	
 	public int getObjectId() {
 		return featureProperties.objectId;
 	}

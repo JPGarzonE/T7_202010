@@ -13,7 +13,7 @@ public class LinearProbingHash<Key extends Comparable<Key>, Value> implements IL
 	/**
 	 * Array that contains all the values of the map
 	 */
-	private ILinkedList<Value>[] vals;
+	private IQueue<Value>[] vals;
 	
 	/**
 	 * Number of elements in the map
@@ -30,14 +30,14 @@ public class LinearProbingHash<Key extends Comparable<Key>, Value> implements IL
 		size = 4;
 		n = 0;
 		keys = (Key[]) new Comparable[ size ];
-		vals = (ILinkedList<Value>[]) new Object[ size ];
+		vals = (IQueue<Value>[]) new Object[ size ];
 	}
 	
 	public LinearProbingHash(int capacity){
 		size = capacity;
 		n = 0;
 		keys = (Key[]) new Comparable[ size ];
-		vals = new ILinkedList[ size ];
+		vals = new IQueue[ size ];
 	}
 	
 	public void put(Key key, Value value) {
@@ -52,17 +52,20 @@ public class LinearProbingHash<Key extends Comparable<Key>, Value> implements IL
 		
 		for( i = hash(key); keys[i] != null; i = (i+1) % size ){
 			if( keys[i].equals(key) ){
-				vals[i].addNode(value);
+				vals[i].enqueue(value);
 				return;
 			}
 		}
 		
 		keys[i] = key;
-		vals[i] = new LinkedList<Value>();
+		
+		IQueue<Value> queueVal = new Queue<Value>();
+		queueVal.enqueue(value);
+		vals[i] = queueVal;
 		n++;
 	}
 	
-	private void put(Key key, ILinkedList<Value> value){
+	private void put(Key key, IQueue<Value> value){
 		if( key == null || value == null )
 			throw new IllegalArgumentException("The key or the value can't be null in private put");
 		
@@ -118,7 +121,26 @@ public class LinearProbingHash<Key extends Comparable<Key>, Value> implements IL
 	
 	public Value[] get(Key key) {
 		
+		if( key == null ) 
+			throw new IllegalArgumentException("key can't be null in get");
+
+		for( int i = hash(key); keys[i] != null; i = (i+1) % size ){
+			if( keys[i].equals(key) ){
+				Iterator<Value> valueIterator = vals[i].iterator();
+				Value[] values = (Value[]) new Object[ vals[i].size() ];
+				
+				for( int j = 0; valueIterator.hasNext(); j++ )
+					values[j] = valueIterator.next();
+					
+				return values;
+			}
+		}
+		
 		return null;
+	}
+	
+	public IQueue<Value>[] getValues(){
+		return vals;
 	}
 	
 	public int size() {
@@ -148,9 +170,43 @@ public class LinearProbingHash<Key extends Comparable<Key>, Value> implements IL
 
 	
 	public Iterator<Key> keys() {
-		ArrayList<Key> keys = new ArrayList<>( size() );
-		keys.addAll(keys);
-		return keys.iterator();
+		
+		IQueue<Key> keyQueue = new Queue<Key>();
+		
+		for( int i = 0; i < keys.length; i++ )
+			keyQueue.enqueue( keys[i] );
+		
+		return keyQueue.iterator();
+	}
+	
+	public Iterator<Value> values(){
+		
+		IQueue<Value> valQueue = new Queue<Value>();
+		
+		for( int i = 0; i < vals.length; i++ ){
+			Iterator<Value> valIterator = vals[i].iterator();
+			while( valIterator.hasNext() )
+				valQueue.enqueue( valIterator.next() );
+		}
+		
+		return valQueue.iterator();
+		
+	}
+	
+	public Iterator<Value> deleteAndReturn(){
+		IQueue<Value> valQueue = new Queue<Value>();
+		
+		for( int i = 0; i < vals.length; i++ ){
+			IQueue<Value> actValue = vals[i];
+			while( !actValue.isEmpty() )
+				valQueue.enqueue( actValue.dequeue() );
+			
+			vals[i] = null;
+		}
+		
+		resize(4);
+		
+		return valQueue.iterator();
 	}
 
 }

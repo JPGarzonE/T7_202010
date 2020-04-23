@@ -1,27 +1,33 @@
 package model.data_structures;
 
-public interface IRedBlackBST<Key extends Comparable<Key>, Val> {
+import java.util.Iterator;
 
-	public void put(Key k, Val v);
-	
-	public Val get(Key k);
-	
-	public void delete(Key k);
-	
-	public boolean contains(Key k);
+public interface IRedBlackBST<Key extends Comparable<Key>, Value> {
+
+	public void emptyTree();
 	
 	public int size();
 	
-	public Key floor(Key k);
+	public boolean isEmpty();
 	
-	public Key ceiling(Key k);
+	public Value get(Key key);
 	
-	public int rank(Key k);
+	public int getHeight(Key key);
 	
-	public Key select(int i);
+	public boolean contains(Key key);
 	
-	public Iterable<Key> keys();
+	public void put(Key key, Value value);
 	
-	public Iterable<Key> keys(Key min, Key max);
+	public int height();
+	
+	public Key min();
+	
+	public Key max();
+		
+	public Iterator<Key> keys();
+	
+	public Iterator<Value> valuesInRange(Key init, Key end);
+	
+	public Iterator<Key> keysInRange(Key init, Key end);
 	
 }

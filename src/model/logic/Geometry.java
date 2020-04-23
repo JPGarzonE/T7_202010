@@ -14,5 +14,13 @@ public class Geometry {
 		this.coordinates = coordinates;
 		
 	}
+	
+	public double getLatitud(){
+		return coordinates.get(0);
+	}
+	
+	public double getLongitud(){
+		return coordinates.get(1);
+	}
 
 }

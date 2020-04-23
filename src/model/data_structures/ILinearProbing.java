@@ -2,6 +2,8 @@ package model.data_structures;
 
 import java.util.Iterator;
 
+import model.logic.Feature;
+
 public interface ILinearProbing<Key extends Comparable<Key>, Value> {
 
 	public void put(Key key ,Value value);
@@ -10,6 +12,8 @@ public interface ILinearProbing<Key extends Comparable<Key>, Value> {
 	
 	public Value[] get(Key key);
 		
+	public IQueue<Value>[] getValues();
+	
 	public int size();
 	
 	public int hash(Key key);
@@ -18,6 +22,10 @@ public interface ILinearProbing<Key extends Comparable<Key>, Value> {
 	
 	public boolean contains(Key key);
 	
-	Iterator<Key> keys();
+	public Iterator<Key> keys();
+	
+	public Iterator<Value> values();
+	
+	public Iterator<Value> deleteAndReturn();
 	
 }

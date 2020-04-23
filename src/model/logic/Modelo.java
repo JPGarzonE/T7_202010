@@ -2,26 +2,52 @@ package model.logic;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
+import Exception.DataStructureException;
 import model.data_structures.ILinearProbing;
 import model.data_structures.IMaxPQ;
+import model.data_structures.IQueue;
 import model.data_structures.IRedBlackBST;
 import model.data_structures.LinearProbingHash;
 import model.data_structures.MaxPQ;
+import model.data_structures.RedBlackBST;
 
 /**
  * Definicion del modelo del mundo
  *
  */
 public class Modelo {
+	
+	private static final String MAXPQ = "MAXPQ";
+	
+	private static final String HASHMAP = "HASHMAP";
+	
+	private static final String REDBLACKTREE = "REDBLACKTREE";
+	
+	private static final String Req1A = "Req1A";
+	
+	private static final String Req2A = "Req2A";
+	
+	private static final String Req3A = "Req3A";
+	
+	private static final String Req1B = "Req1B";
+	
+	private static final String Req2B = "Req2B";
+	
+	private static final String Req3B = "Req3B";
 	
 	/**
 	 * MaxPQ for requirements 1A y 1B
@@ -79,7 +105,9 @@ public class Modelo {
 	{
 		priorityQueue = new MaxPQ<>(capacity, new SevereComparator<>());
 		hashMap = new LinearProbingHash<>(capacity);
-//		redBlacktree = 
+		redBlacktree = new RedBlackBST<>(); 
+		
+		dataStructureInUse = MAXPQ;
 	}
 	
 	/**
@@ -106,31 +134,277 @@ public class Modelo {
 		return dataStructureInUse;
 	}
 	
-	public void migrateDataFromQueueToHash(){
+	public void migrateData( String requirement ) throws DataStructureException{
+		
+		switch( requirement ){
+			case Req1A:
+				switch( dataStructureInUse ){
+					case MAXPQ:
+						priorityQueue.changeComparator( new SevereComparator<>() );
+						break;
+					case HASHMAP:
+						migrateDataFromHashToQueue(Req1A);
+						break;
+					case REDBLACKTREE:
+						migrateDataFromTreeToQueue(Req1A);
+						break;
+				}
+				break;
+			case Req2A:
+				switch( dataStructureInUse ){
+					case MAXPQ:
+						migrateDataFromQueueToHash(Req2A);
+						break;
+					case HASHMAP:
+						
+						break;
+					case REDBLACKTREE:
+						migrateDataFromTreeToHash(Req2A);
+						break;
+				}
+				break;
+			case Req3A:
+				switch( dataStructureInUse ){
+					case MAXPQ:
+						migrateDataFromoHashToTree(Req3A);
+						break;
+					case HASHMAP:
+						migrateDataFromoHashToTree(Req3A);
+						break;
+					case REDBLACKTREE:
+						
+						break;
+				}
+				break;
+			case Req1B:
+				switch( dataStructureInUse ){
+					case MAXPQ:
+						priorityQueue.changeComparator( /*aquí va el otro comparador*/ );
+						break;
+					case HASHMAP:
+						migrateDataFromHashToQueue(Req1B);
+						break;
+					case REDBLACKTREE:
+						migrateDataFromTreeToQueue(Req1B);
+						break;
+				}
+				break;
+			case Req2B:
+				switch( dataStructureInUse ){
+					case MAXPQ:
+						migrateDataFromQueueToHash(Req2B);
+						break;
+					case HASHMAP:
+						
+						break;
+					case REDBLACKTREE:
+						migrateDataFromTreeToHash(Req2B);
+						break;
+				}
+				break;
+			case Req3B:
+				switch( dataStructureInUse ){
+					case MAXPQ:
+						migrateDataFromoHashToTree(Req3B);
+						break;
+					case HASHMAP:
+						migrateDataFromoHashToTree(Req3B);
+						break;
+					case REDBLACKTREE:
+						
+						break;
+				}
+				break;
+		}
 		
 	}
 	
-	public void migrateDataFromQueueToTree(){
+	public void migrateDataFromQueueToHash( String requirement ) throws DataStructureException{
+		if( !dataStructureInUse.equals(MAXPQ) )
+			throw new DataStructureException("Can't migrate from Queue because is empty");
+		
+		while( !priorityQueue.isEmpty() ){
+			Feature feature = priorityQueue.delMax();
+			String compoundKey = "";
+			
+			if( requirement.equals( Req2A ) ){
+				
+				Calendar calendar = Calendar.getInstance();
+				DateFormat format  = new SimpleDateFormat("yyyy-MM-dd");
+				Date date;
+				try {
+					date = format.parse(feature.getDate());
+					calendar.setTime(date);
+					String weekDay = Integer.toString( calendar.get(calendar.DAY_OF_WEEK) );
+					String month = Integer.toString( calendar.get(calendar.MONTH) );
+					
+					compoundKey = month + "-" + weekDay;
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			} else if( requirement.equals( Req2B ) ){
+				compoundKey = feature.getDetectionMethod() + "-" + feature.getVehicleClass()
+					+ "-" + feature.getServiceType() + "-" + feature.getLocality();
+			}
+			
+			hashMap.put(compoundKey, feature);
+		}
+	}
+	
+	public void migrateDataFromQueueToTree( String requirement ) throws DataStructureException{
+		if( !dataStructureInUse.equals(MAXPQ) )
+			throw new DataStructureException("Can't migrate from Queue because is empty");
+		
+		while( !priorityQueue.isEmpty() ){
+			Feature feature = priorityQueue.delMax();
+			String key = "";
+			
+			if( requirement.equals( Req3A ) ){
+				
+				DateFormat parser  = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
+				Date date;
+				try {
+					date = parser.parse(feature.getDate());
+					DateFormat formater = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+					key = formater.format(date);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			} else if( requirement.equals( Req3B ) ){
+				key = Double.toString( feature.getLatitud() );
+			}
+			
+			redBlacktree.put(key, feature);
+		
+		}
+	}
+	
+	public void migrateDataFromHashToQueue( String requirement ) throws DataStructureException{
+		if( !dataStructureInUse.equals(HASHMAP) )
+			throw new DataStructureException("Can't migrate from Hash because is empty");
+
+		Comparator<Feature> comparator = requirement.equals( Req1A ) ? new SevereComparator<>() : null;
+		
+		priorityQueue.changeComparator(comparator);
+
+		IQueue<Feature>[] vals = hashMap.getValues();
+		
+		for( int i = 0; i < vals.length; i++ ){
+			IQueue<Feature> actValue = vals[i];
+			while( !actValue.isEmpty() )
+				priorityQueue.insert( actValue.dequeue() );
+			
+			vals[i] = null;
+		}
+		
+		// resizing hash
+		vals = (IQueue<Feature>[]) new Object[7];
 		
 	}
 	
-	public void migrateDataFromHashToQueue(){
+	public void migrateDataFromoHashToTree( String requirement ) throws DataStructureException{
+		if( !dataStructureInUse.equals(HASHMAP) )
+			throw new DataStructureException("Can't migrate from Hash because is empty");
+
+		IQueue<Feature>[] vals = hashMap.getValues();
+		
+		for( int i = 0; i < vals.length; i++ ){
+			
+			IQueue<Feature> actValue = vals[i];
+			
+			while( !actValue.isEmpty()){
+				Feature feature = actValue.dequeue();
+				String key = "";
+				
+				if( requirement.equals( Req3A ) ){
+					
+					DateFormat parser  = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
+					Date date;
+					try {
+						date = parser.parse(feature.getDate());
+						DateFormat formater = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+						key = formater.format(date);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				
+				} else if( requirement.equals( Req3B ) ){
+					key = Double.toString( feature.getLatitud() );
+				}
+				
+					
+				redBlacktree.put(key, feature);
+			}
+				
+			vals[i] = null;
+		}
+		
+		// resizing hash
+		vals = (IQueue<Feature>[]) new Object[7];
+	}
+	
+	public void migrateDataFromTreeToQueue( String requirement ) throws DataStructureException{
+		if( !dataStructureInUse.equals(REDBLACKTREE) )
+			throw new DataStructureException("Can't migrate from Tree because is empty");
+		
+		Iterator<Feature> treeIterator = redBlacktree.valuesInRange( redBlacktree.min(), redBlacktree.max() );
+		
+		Comparator<Feature> comparator = requirement.equals( Req1A ) ? new SevereComparator<>() : null;
+		priorityQueue.changeComparator(comparator);
+		
+		while( treeIterator.hasNext() ){
+			Feature featureVal = treeIterator.next();
+			priorityQueue.insert(featureVal);
+		}
+		
+		redBlacktree.emptyTree();
 		
 	}
 	
-	public void migrateDataFromoHashToTree(){
+	public void migrateDataFromTreeToHash( String requirement ) throws DataStructureException{
+		if( !dataStructureInUse.equals(REDBLACKTREE) )
+			throw new DataStructureException("Can't migrate from Tree because is empty");
 		
+		Iterator<Feature> treeIterator = redBlacktree.valuesInRange( redBlacktree.min(), redBlacktree.max() );
+		
+		while( treeIterator.hasNext() ){
+			Feature feature = treeIterator.next();	
+			String compoundKey = "";
+			
+			if( requirement.equals( Req2A ) ){
+				
+				Calendar calendar = Calendar.getInstance();
+				DateFormat format  = new SimpleDateFormat("yyyy-MM-dd");
+				Date date;
+				try {
+					date = format.parse(feature.getDate());
+					calendar.setTime(date);
+					String weekDay = Integer.toString( calendar.get(calendar.DAY_OF_WEEK) );
+					String month = Integer.toString( calendar.get(calendar.MONTH) );
+					
+					compoundKey = month + "-" + weekDay;
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			} else if( requirement.equals( Req2B ) ){
+				compoundKey = feature.getDetectionMethod() + "-" + feature.getVehicleClass()
+					+ "-" + feature.getServiceType() + "-" + feature.getLocality();
+			}
+			
+			hashMap.put(compoundKey, feature);
+		}
+		
+		redBlacktree.emptyTree();
 	}
 	
-	public void migrateDataFromTreeToQueue(){
-		
-	}
-	
-	public void migrateDataFromTreeToHash(){
-		
-	}
-	
-	public boolean loadDataList(String path) {
+	public boolean loadDataList(String path){
 		if( loadGson(path) )
 			return true;
 		else	
