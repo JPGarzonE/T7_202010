@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import model.data_structures.ArrayNode;
 import model.logic.Feature;
 import model.logic.Modelo;
 
@@ -133,6 +134,34 @@ public class View
 			printMessage("\n Resultado-----------------------------");
 			while( features.hasNext() )
 				printFeature( features.next() );
+		}
+		
+		public void printFeaturesQuantityInDateRange( ArrayList<ArrayNode<String, Integer>> featuresQuantities, int totalFeaturesQuantity ){
+			int averageQuantityPerRow = totalFeaturesQuantity/featuresQuantities.size();
+
+			int maxStarQuantityPerRow = 25;
+			int starUnit = averageQuantityPerRow / maxStarQuantityPerRow;
+			
+			printMessage("		Rango de fechas 		|		Comparendos durante el año");
+			printMessage("--------------------------------------------------------------------------------------------------------------");
+			featuresQuantities.forEach( (node)->{
+				
+				try{
+					int starQuantity = (int) Math.ceil(node.getValue() / starUnit);
+					String starsString = "";
+					for( int i = 0; i < starQuantity*(3/2); i++ )
+						starsString += "*";
+					
+					if(!starsString.equals("")) printMessage( node.getKey() + "	| " + starsString );
+				}
+				catch(ArithmeticException e){
+				
+				}
+
+				
+			});
+			
+			printMessage("Cada * representa " + starUnit + " Comparendos");
 		}
 		
 		public void printFeaturesComparatedByDate( String date1, String date2, Map<String, Integer> dates1, 

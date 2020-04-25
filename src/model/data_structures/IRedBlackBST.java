@@ -30,4 +30,6 @@ public interface IRedBlackBST<Key extends Comparable<Key>, Value> {
 	
 	public Iterator<Key> keysInRange(Key init, Key end);
 	
+	public int quantityOfValuesInRange(Key init, Key end);
+	
 }

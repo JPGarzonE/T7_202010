@@ -1,7 +1,10 @@
 package model.data_structures;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
+
+import model.logic.Feature;
 
 /**
  *  The {@code MaxPQ} class represents a priority queue of generic keys.
@@ -89,13 +92,13 @@ public class MaxPQ<Value> implements IMaxPQ<Value>{
 	}
 
 	
-	public Value[] max(int n) {
+	public ArrayList<Value> max(int n) {
 		
-		Value[] firstNVals = (Value[]) new Object[ n ];
-		
+		ArrayList<Value> firstNVals = new ArrayList<Value>(n);
+
 		for( int i = 1; i <= n; i++ )
-			firstNVals[i] = priorityQueue[i];
-		
+			firstNVals.add( i-1, priorityQueue[i] );
+			
 		return firstNVals;
 	}
 

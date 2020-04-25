@@ -15,7 +15,11 @@ public class Controller {
 	/* Instancia de la Vista*/
 	private View view;
 	
+<<<<<<< HEAD
 	static final String DATA_PATH = "./data/comparendos_dei_2018_BogotÃ¡_D.C_small.geojson";
+=======
+	static final String DATA_PATH = "./data/comparendos_dei_2018_Bogotá_D.C.geojson";
+>>>>>>> 6969e9fb03e05ad22685bb2e5a3d0c81e9fde986
 	
 	/**
 	 * Crear la vista y el modelo del proyecto
@@ -35,7 +39,7 @@ public class Controller {
 		view.printMessage("\n La aplicaciÃ³n va a cargar los datos inmediatamente de esta ruta: " + DATA_PATH);
 		view.printMessage("\n Â¿Esta de acuerdo? (Y/n)");
 		String answer = lector.next();
-		System.out.println("x");
+
 		if( answer.equalsIgnoreCase("Y") ){
 			loadData();
 		}else{
@@ -59,9 +63,39 @@ public class Controller {
 						break;
 					case 2:
 						view.printMessage("\n Mes (Numero del 1-12):");
+<<<<<<< HEAD
 						String month = lector.next();
 						view.printMessage("\n DÃ­a (Letra L,M,I,J,V,S,D):");
+=======
+						int monthNum = lector.nextInt() - 1;
+						String month = Integer.toString( monthNum );
+						view.printMessage("\n Día (Letra L,M,I,J,V,S,D):");
+>>>>>>> 6969e9fb03e05ad22685bb2e5a3d0c81e9fde986
 						String weekDay = lector.next();
+						
+						switch( weekDay.toUpperCase() ){
+							case "L":
+								weekDay = "2";
+								break;
+							case "M":
+								weekDay = "3";
+								break;
+							case "I":
+								weekDay = "4";
+								break;
+							case "J":
+								weekDay = "5";
+								break;
+							case "V":
+								weekDay = "6";
+								break;
+							case "S":
+								weekDay = "7";
+								break;
+							case "D":
+								weekDay = "1";
+								break;
+						}
 						
 						view.printMessage("\n Buscando...");
 						view.printFeatures( modelo.searchFeaturesByMonthAndDay(month, weekDay) );
@@ -117,9 +151,13 @@ public class Controller {
 						
 						break;
 					case 7:
-						view.printMessage("--------- \n Hasta pronto !! \n---------"); 
-						lector.close();
-						fin = true;
+						view.printMessage("\n ¿En cuantos (d)ías quiere que se divida la muestra? (numero):");
+						int d = lector.nextInt();
+						view.printMessage("\n Procesando...");
+						view.printFeaturesQuantityInDateRange(
+								modelo.searchAllFeaturesByDateRange(d), 
+								modelo.size()
+						);
 						break;
 					case 8:
 						view.printMessage("--------- \n Hasta pronto !! \n---------"); 

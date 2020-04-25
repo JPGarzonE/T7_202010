@@ -293,7 +293,39 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> implements IRedBlac
         
         if (cmphi > 0)
         	valuesInRange(node.getRight(), queue, init, end); 
-    } 
+    }
+	
+	public int quantityOfValuesInRange( Key init, Key end ){
+		if (init == null) 
+        	throw new IllegalArgumentException("init can't be null in valuesInRange(init,end)");
+        
+        if (end == null) 
+        	throw new IllegalArgumentException("end can't be null in ValuesInRange(init,end)");
+
+        int quantityOfValuesInRange = quantityOfValuesInRange(root, init, end);
+        
+        return quantityOfValuesInRange;
+	}
+	
+	private int quantityOfValuesInRange(TreeNode<Key,Value> node, Key init, Key end){
+		if (node == null) 
+        	return 0;
+        
+		int counter = 0;
+        int cmplo = init.compareTo( node.getKey() ); 
+        int cmphi = end.compareTo( node.getKey() );
+        
+        if (cmplo < 0) 
+        	counter += quantityOfValuesInRange(node.getLeft(), init, end); 
+        
+        if (cmplo <= 0 && cmphi >= 0)
+        	counter += 1; 
+
+        if (cmphi > 0)
+        	counter += quantityOfValuesInRange(node.getRight(), init, end); 
+        
+        return counter;
+	}
 	
 	
    /***************************************************************************
