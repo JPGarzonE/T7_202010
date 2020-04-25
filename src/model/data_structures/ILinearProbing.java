@@ -2,15 +2,13 @@ package model.data_structures;
 
 import java.util.Iterator;
 
-import model.logic.Feature;
-
 public interface ILinearProbing<Key extends Comparable<Key>, Value> {
 
 	public void put(Key key ,Value value);
 
 	public void resize(int capacity);
 	
-	public Value[] get(Key key);
+	public Iterator<Value> get(Key key);
 		
 	public IQueue<Value>[] getValues();
 	

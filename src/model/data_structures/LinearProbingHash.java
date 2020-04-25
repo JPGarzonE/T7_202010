@@ -119,24 +119,20 @@ public class LinearProbingHash<Key extends Comparable<Key>, Value> implements IL
 		return isPrime;
 	}
 	
-	public Value[] get(Key key) {
+	public Iterator<Value> get(Key key) {
 		
 		if( key == null ) 
 			throw new IllegalArgumentException("key can't be null in get");
-
+		
+		IQueue<Value> valueQueue = new Queue<>();
+		
 		for( int i = hash(key); keys[i] != null; i = (i+1) % size ){
 			if( keys[i].equals(key) ){
-				Iterator<Value> valueIterator = vals[i].iterator();
-				Value[] values = (Value[]) new Object[ vals[i].size() ];
-				
-				for( int j = 0; valueIterator.hasNext(); j++ )
-					values[j] = valueIterator.next();
-					
-				return values;
+				valueQueue = vals[i];
 			}
 		}
 		
-		return null;
+		return valueQueue.iterator();
 	}
 	
 	public IQueue<Value>[] getValues(){

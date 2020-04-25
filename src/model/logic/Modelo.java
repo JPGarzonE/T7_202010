@@ -18,6 +18,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import Exception.DataStructureException;
+import model.data_structures.ArrayNode;
 import model.data_structures.ILinearProbing;
 import model.data_structures.IMaxPQ;
 import model.data_structures.IQueue;
@@ -105,7 +106,7 @@ public class Modelo {
 	 */
 	public Modelo(int capacity )
 	{
-		priorityQueue = new MaxPQ<>(capacity, new SevereComparator<>());
+		priorityQueue = new MaxPQ<Feature>(capacity, new SevereComparator<>());
 		hashMap = new LinearProbingHash<>(capacity);
 		redBlacktree = new RedBlackBST<>(); 
 		
@@ -136,15 +137,14 @@ public class Modelo {
 		return dataStructureInUse;
 	}
 	
-	public Feature[] searchTopSeverityFeatures( int m ) throws DataStructureException{
+	public ArrayList<Feature> searchTopSeverityFeatures( int m ) throws DataStructureException{
 		
 		migrateData( Req1A );
 		
 		return priorityQueue.max( m );
-		
 	}
 	
-	public Feature[] searchFeaturesByMonthAndDay( String monthNumber, String weekDay ) throws DataStructureException{
+	public Iterator<Feature> searchFeaturesByMonthAndDay( String monthNumber, String weekDay ) throws DataStructureException{
 		
 		migrateData( Req2A );
 		
@@ -172,6 +172,64 @@ public class Modelo {
 
 		return featureQueue.iterator();
 	}
+	
+	public ArrayList<ArrayNode<String, Integer>> searchAllFeaturesByDateRange( int d )  throws DataStructureException{
+		
+		migrateData( Req3A );
+		
+		int featuresSize = redBlacktree.size();
+		ArrayNode<String, Integer> node;
+		ArrayList<ArrayNode<String, Integer>> features = new ArrayList<>(60);
+		
+		int quantityInRank = 0;
+		String minDateInRank = redBlacktree.min();
+		String maxDateInRank = addDate( minDateInRank, d );
+		
+		int timesRangeZero = 0;
+		
+		int j = 0;
+		for( int i = 0; i < featuresSize; i += quantityInRank ){
+			quantityInRank = redBlacktree.quantityOfValuesInRange(minDateInRank, maxDateInRank);
+			
+			if(quantityInRank==0){
+				timesRangeZero++;
+			}
+			else{
+				String key = minDateInRank + " - " + maxDateInRank;
+				node = new ArrayNode<String, Integer>(key, quantityInRank);
+				features.add(j, node);
+				j++;
+			}
+				
+			if((featuresSize/80) < timesRangeZero)
+				break;
+			
+			minDateInRank = addDate( maxDateInRank, 1);
+			maxDateInRank = addDate( minDateInRank, d);
+		}
+		System.out.println("search finished");
+		return features;
+		
+	}
+	
+	private String addDate( String dateString, int days ){
+		
+		try{
+			DateFormat dateParser = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+			Date date = dateParser.parse(dateString);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			calendar.add(Calendar.DAY_OF_YEAR, days);
+			
+			return dateParser.format( calendar.getTime() );
+		}
+		catch( ParseException e ){
+			e.printStackTrace();
+			return "";
+		}
+		
+	}
+
 	
 	public void migrateData( String requirement ) throws DataStructureException{
 		
@@ -205,7 +263,7 @@ public class Modelo {
 			case Req3A:
 				switch( dataStructureInUse ){
 					case MAXPQ:
-						migrateDataFromoHashToTree(Req3A);
+						migrateDataFromQueueToTree(Req3A);
 						break;
 					case HASHMAP:
 						migrateDataFromoHashToTree(Req3A);
@@ -218,7 +276,7 @@ public class Modelo {
 			case Req1B:
 				switch( dataStructureInUse ){
 					case MAXPQ:
-						priorityQueue.changeComparator( /*aquí va el otro comparador*/ );
+//						priorityQueue.changeComparator( /*aquí va el otro comparador*/ );
 						break;
 					case HASHMAP:
 						migrateDataFromHashToQueue(Req1B);
@@ -303,7 +361,7 @@ public class Modelo {
 			
 			if( requirement.equals( Req3A ) ){
 				
-				DateFormat parser  = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
+				DateFormat parser  = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 				Date date;
 				try {
 					date = parser.parse(feature.getDate());
@@ -356,7 +414,7 @@ public class Modelo {
 		
 		for( int i = 0; i < vals.length; i++ ){
 			
-			IQueue<Feature> actValue = vals[i];
+			IQueue<Feature> actValue = vals[i] != null ? vals[i] : new Queue<>();
 			
 			while( !actValue.isEmpty()){
 				Feature feature = actValue.dequeue();
