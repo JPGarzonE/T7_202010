@@ -144,6 +144,13 @@ public class Modelo {
 		
 	}
 	
+	public Feature[] searchNearestFeatures (int m) throws DataStructureException{
+		
+		migrateData (Req1B);
+		
+		return priorityQueue.max(m);
+	}
+	
 	public Feature[] searchFeaturesByMonthAndDay( String monthNumber, String weekDay ) throws DataStructureException{
 		
 		migrateData( Req2A );
@@ -152,6 +159,15 @@ public class Modelo {
 		
 		return hashMap.get(compoundKey);
 		
+	}
+	
+	public Feature [] searchFeaturesByParameters (String detection, String vehicleClass, String serviceType, String locality) throws DataStructureException{
+		
+		migrateData (Req2B);
+		
+		String compoundKey = detection + "-" + vehicleClass + "-" + serviceType + "-" + locality;
+		
+		return hashMap.get(compoundKey);
 	}
 	
 	public Iterator<Feature> searchFeaturesByDateAndLocality( String initDate, String endDate, String locality ) throws DataStructureException{
@@ -165,6 +181,25 @@ public class Modelo {
 			Feature actFeature = featureIterator.next();
 			
 			if( actFeature.getLocality().equals(locality) )
+				featureQueue.enqueue(actFeature);
+		}
+		
+		featureIterator = null;
+
+		return featureQueue.iterator();
+	}
+	
+	public Iterator<Feature> searchFeaturesByLatitudeAndVehicleType (String lowLatitude, String highLatitude, String vehicleClass) throws DataStructureException{
+		
+		migrateData(Req3B);
+		
+		IQueue<Feature> featureQueue = new Queue<>();
+		Iterator<Feature> featureIterator = redBlacktree.valuesInRange(lowLatitude, highLatitude);
+		
+		while( featureIterator.hasNext() ){
+			Feature actFeature = featureIterator.next();
+			
+			if( actFeature.getVehicleClass().equals(vehicleClass))
 				featureQueue.enqueue(actFeature);
 		}
 		
@@ -218,7 +253,7 @@ public class Modelo {
 			case Req1B:
 				switch( dataStructureInUse ){
 					case MAXPQ:
-						priorityQueue.changeComparator( /*aquí va el otro comparador*/ );
+						priorityQueue.changeComparator( new NearComparator<>() );
 						break;
 					case HASHMAP:
 						migrateDataFromHashToQueue(Req1B);
@@ -329,8 +364,10 @@ public class Modelo {
 			throw new DataStructureException("Can't migrate from Hash because is empty");
 
 		Comparator<Feature> comparator = requirement.equals( Req1A ) ? new SevereComparator<>() : null;
+		Comparator<Feature> comparator2 = requirement.equals( Req1B ) ? new NearComparator<>() : null;
 		
 		priorityQueue.changeComparator(comparator);
+		priorityQueue.changeComparator(comparator2);
 
 		IQueue<Feature>[] vals = hashMap.getValues();
 		

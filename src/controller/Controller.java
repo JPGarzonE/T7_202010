@@ -15,7 +15,7 @@ public class Controller {
 	/* Instancia de la Vista*/
 	private View view;
 	
-	static final String DATA_PATH = "./data/comparendos_dei_2018_Bogot�_D.C_small.geojson";
+	static final String DATA_PATH = "./data/comparendos_dei_2018_Bogotá_D.C_small.geojson";
 	
 	/**
 	 * Crear la vista y el modelo del proyecto
@@ -32,8 +32,8 @@ public class Controller {
 		Scanner lector = new Scanner(System.in);
 		boolean fin = false;
 		
-		view.printMessage("\n La aplicaci�n va a cargar los datos inmediatamente de esta ruta: " + DATA_PATH);
-		view.printMessage("\n �Esta de acuerdo? (Y/n)");
+		view.printMessage("\n La aplicación va a cargar los datos inmediatamente de esta ruta: " + DATA_PATH);
+		view.printMessage("\n ¿Esta de acuerdo? (Y/n)");
 		String answer = lector.next();
 		System.out.println("x");
 		if( answer.equalsIgnoreCase("Y") ){
@@ -51,7 +51,7 @@ public class Controller {
 				int option = lector.nextInt();
 				switch(option){
 					case 1:
-						view.printMessage("\n �Cu�ntos comparendos deseas mirar?"); 
+						view.printMessage("\n ¿Cuántos comparendos deseas mirar?"); 
 						int m = lector.nextInt();
 						view.printMessage("\n Buscando...");
 						view.printFeatures( modelo.searchTopSeverityFeatures(m) );
@@ -60,7 +60,7 @@ public class Controller {
 					case 2:
 						view.printMessage("\n Mes (Numero del 1-12):");
 						String month = lector.next();
-						view.printMessage("\n D�a (Letra L,M,I,J,V,S,D):");
+						view.printMessage("\n Día (Letra L,M,I,J,V,S,D):");
 						String weekDay = lector.next();
 						
 						view.printMessage("\n Buscando...");
@@ -82,19 +82,39 @@ public class Controller {
 						
 						break;
 					case 4:
-						view.printMessage("--------- \n Hasta pronto !! \n---------"); 
-						lector.close();
-						fin = true;
+						view.printMessage("\n ¿Cuántos comparendos deseas mirar cercanos a la estacion de policía del Campín?"); 
+						int n = lector.nextInt();
+						view.printMessage("\n Buscando...");
+						view.printFeatures( modelo.searchNearestFeatures(n));
+						
 						break;
 					case 5:
-						view.printMessage("--------- \n Hasta pronto !! \n---------"); 
-						lector.close();
-						fin = true;
+						view.printMessage("\n Medio de Deteccion:");
+						String detection = lector.next();
+						view.printMessage("\n Clase de vehiculo:");
+						String vehicleClass = lector.next();
+						view.printMessage("\n Tipo de servicio:");
+						String serviceType = lector.next();
+						view.printMessage("\n Localidad:");
+						String locality1 = lector.next();
+						
+						view.printMessage("\n Buscando...");
+						view.printFeatures( modelo.searchFeaturesByParameters(detection, vehicleClass, serviceType, locality1));
+						
+						
 						break;
 					case 6:
-						view.printMessage("--------- \n Hasta pronto !! \n---------"); 
-						lector.close();
-						fin = true;
+						view.printMessage("\n Latitud baja:");
+						String lowLatitude = lector.next();
+						view.printMessage("\n Latitud alta:");
+						String highLatitude = lector.next();
+						view.printMessage("\n Clase de vehiculo:");
+						String vehicleClass1 = lector.next();
+						
+						view.printMessage("\n Buscando...");
+						view.printFeatures( modelo.searchFeaturesByLatitudeAndVehicleType(lowLatitude, highLatitude, vehicleClass1));
+						
+						
 						break;
 					case 7:
 						view.printMessage("--------- \n Hasta pronto !! \n---------"); 

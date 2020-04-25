@@ -21,13 +21,13 @@ public class View
 		public void printMenu()
 		{
 			System.out.println("1. (Req1A) - Obtener los M comparendos con mayor gravedad");
-			System.out.println("2. (Req2A) - Buscar los comparendos por mes y día de la semana");
+			System.out.println("2. (Req2A) - Buscar los comparendos por mes y dÃ­a de la semana");
 			System.out.println("3. (Req3A) - Buscar los comparendos en un rango por fecha-hora y localidad");
-			System.out.println("4. (Req1B) - Buscar los M comparendos más cercanos a la estación de policía");
-			System.out.println("5. (Req2B) - Buscar los comparendos por medio de detección, clase de vehículo, tipo de servicio y localidad");
-			System.out.println("6. (Req3B) - Buscar los comparendos en un rango por latitud y tipo de vehículo");
+			System.out.println("4. (Req1B) - Buscar los M comparendos mÃ¡s cercanos a la estaciÃ³n de policï¿½a");
+			System.out.println("5. (Req2B) - Buscar los comparendos por medio de detecciï¿½n, clase de vehÃ­culo, tipo de servicio y localidad");
+			System.out.println("6. (Req3B) - Buscar los comparendos en un rango por latitud y tipo de vehÃ­culo");
 			System.out.println("7. (Req1C) - Visualizar Datos en una Tabla ASCII");
-			System.out.println("8. (Req2C) - El costo de los tiempos de espera hoy en día");
+			System.out.println("8. (Req2C) - El costo de los tiempos de espera hoy en dÃ­a");
 			System.out.println("9. (Req3C) - El costo de los tiempos de espera usando el nuevo sistema");
 			System.out.println("10. Exit");
 			System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
@@ -138,7 +138,7 @@ public class View
 		public void printFeaturesComparatedByDate( String date1, String date2, Map<String, Integer> dates1, 
 				Map<String, Integer> dates2){
 			
-			printMessage("Infracción	|	" + date1 + "	|	" + date2);
+			printMessage("Infracciï¿½n	|	" + date1 + "	|	" + date2);
 			
 			dates1.forEach( (key, val) -> {
 				boolean dates2ContainKey = dates2.containsKey(key);
@@ -155,7 +155,7 @@ public class View
 		public void printFeaturesComparatedByServiceType( String particularType, String publicType, Map<String, Integer> particularT, 
 				Map<String, Integer> publicT){
 			
-			printMessage("Infracción	|	" + particularType + "	|	" + publicType);
+			printMessage("Infracciï¿½n	|	" + particularType + "	|	" + publicType);
 			
 			particularT.forEach( (key, val) -> {
 				boolean publicTContainKey = publicT.containsKey(key);
@@ -175,7 +175,7 @@ public class View
 			
 			printMessage(message + " del " + initialDate + " al " + finalDate);
 			
-			printMessage("Infracción	|	#Comparendos");
+			printMessage("Infracciï¿½n	|	#Comparendos");
 			
 			features.forEach( (key, val) -> {
 				printMessage(key + "		|	" + val);

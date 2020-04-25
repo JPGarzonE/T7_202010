@@ -22,5 +22,9 @@ public class Geometry {
 	public double getLongitud(){
 		return coordinates.get(1);
 	}
-
+	
+	public Feature nearestFeature() {
+		return null;
+	}
+	
 }
