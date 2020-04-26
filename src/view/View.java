@@ -7,7 +7,6 @@ import java.util.Map;
 
 import model.data_structures.ArrayNode;
 import model.logic.Feature;
-import model.logic.Modelo;
 
 public class View 
 {
@@ -142,7 +141,7 @@ public class View
 			int maxStarQuantityPerRow = 25;
 			int starUnit = averageQuantityPerRow / maxStarQuantityPerRow;
 			
-			printMessage("		Rango de fechas 		|		Comparendos durante el año");
+			printMessage("		Rango de fechas 		|		Comparendos durante el aï¿½o");
 			printMessage("--------------------------------------------------------------------------------------------------------------");
 			featuresQuantities.forEach( (node)->{
 				
