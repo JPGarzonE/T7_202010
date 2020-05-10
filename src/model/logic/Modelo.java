@@ -1,7 +1,9 @@
 package model.logic;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +29,7 @@ import model.data_structures.LinearProbingHash;
 import model.data_structures.MaxPQ;
 import model.data_structures.Queue;
 import model.data_structures.RedBlackBST;
+import model.data_structures.UndirectedGraph;
 
 /**
  * Definicion del modelo del mundo
@@ -34,38 +37,10 @@ import model.data_structures.RedBlackBST;
  */
 public class Modelo {
 	
-	private static final String MAXPQ = "MAXPQ";
-	
-	private static final String HASHMAP = "HASHMAP";
-	
-	private static final String REDBLACKTREE = "REDBLACKTREE";
-	
-	private static final String Req1A = "Req1A";
-	
-	private static final String Req2A = "Req2A";
-	
-	private static final String Req3A = "Req3A";
-	
-	private static final String Req1B = "Req1B";
-	
-	private static final String Req2B = "Req2B";
-	
-	private static final String Req3B = "Req3B";
-	
 	/**
-	 * MaxPQ for requirements 1A y 1B
+	 * UndirectedGraph
 	 */
-	private IMaxPQ<Feature> priorityQueue;
-	
-	/**
-	 * LinearProbingHash for requirements 2A y 2B
-	 */
-	private ILinearProbing<String, Feature> hashMap;
-	
-	/**
-	 * RedBlackBinarySearchTree for requirements 3A y 3B
-	 */
-	private IRedBlackBST<String, Feature> redBlacktree;
+	private UndirectedGraph<String, Intersection> graph;
 	
 	/**
 	 * First feature
@@ -88,11 +63,6 @@ public class Modelo {
 	private int size;
 	
 	/**
-	 * Estructura de datos que se esta usando actualmente
-	 */
-	private String dataStructureInUse;
-	
-	/**
 	 * Constructor del modelo del mundo con capacidad predefinida
 	 */
 	public Modelo()
@@ -105,20 +75,16 @@ public class Modelo {
 	 * @param tamano
 	 */
 	public Modelo(int capacity )
-	{
-		priorityQueue = new MaxPQ<Feature>(capacity, new SevereComparator<>());
-		hashMap = new LinearProbingHash<>(capacity);
-		redBlacktree = new RedBlackBST<>(); 
-		
-		dataStructureInUse = MAXPQ;
+	{ 
+		graph = new UndirectedGraph<>(20);
 	}
 	
-	/**
-	 * Servicio de consulta de numero de elementos presentes en el modelo 
-	 * @return numero de elementos presentes en el modelo
-	 */
-	public int size(){
-		return size;
+	public int vertexSize(){
+		return graph.V();
+	}
+	
+	public int edgesSize(){
+		return graph.E();
 	}
 	
 	public Feature getFirstFeature(){
@@ -133,509 +99,45 @@ public class Modelo {
 		return featureWithBiggestId;
 	}
 	
-	public String getDataStructureInUse(){
-		return dataStructureInUse;
-	}
-	
-	public ArrayList<Feature> searchTopSeverityFeatures( int m ) throws DataStructureException{
-		
-		migrateData( Req1A );
-		
-		return priorityQueue.max( m );
-	}
-	
-
-	public ArrayList<Feature> searchNearestFeatures (int m) throws DataStructureException{
-		
-		migrateData (Req1B);
-		
-		return priorityQueue.max(m);
-	}
-	
-	
-	public Iterator<Feature> searchFeaturesByMonthAndDay( String monthNumber, String weekDay ) throws DataStructureException{
-		
-		migrateData( Req2A );
-		
-		String compoundKey = monthNumber + "-" + weekDay;
-		
-		return hashMap.get(compoundKey);
-		
-	}
-	
-	public Iterator<Feature> searchFeaturesByParameters (String detection, String vehicleClass, String serviceType, String locality) throws DataStructureException{
-		
-		migrateData (Req2B);
-		
-		String compoundKey = detection + "-" + vehicleClass + "-" + serviceType + "-" + locality;
-		
-		return hashMap.get(compoundKey);
-	}
-	
-	public Iterator<Feature> searchFeaturesByDateAndLocality( String initDate, String endDate, String locality ) throws DataStructureException{
-		
-		migrateData(Req3A);
-		
-		IQueue<Feature> featureQueue = new Queue<>();
-		Iterator<Feature> featureIterator = redBlacktree.valuesInRange(initDate, endDate);
-		
-		while( featureIterator.hasNext() ){
-			Feature actFeature = featureIterator.next();
-			
-			if( actFeature.getLocality().equals(locality) )
-				featureQueue.enqueue(actFeature);
-		}
-		
-		featureIterator = null;
-
-		return featureQueue.iterator();
-	}
-	
-	
-	public Iterator<Feature> searchFeaturesByLatitudeAndVehicleType (String lowLatitude, String highLatitude, String vehicleClass) throws DataStructureException{
-		
-		migrateData(Req3B);
-		
-		IQueue<Feature> featureQueue = new Queue<>();
-		Iterator<Feature> featureIterator = redBlacktree.valuesInRange(lowLatitude, highLatitude);
-		
-		while( featureIterator.hasNext() ){
-			Feature actFeature = featureIterator.next();
-			
-			if( actFeature.getVehicleClass().equals(vehicleClass))
-				featureQueue.enqueue(actFeature);
-		}
-		
-		featureIterator = null;
-
-		return featureQueue.iterator();
-	}
-	
-	
-	public ArrayList<ArrayNode<String, Integer>> searchAllFeaturesByDateRange( int d )  throws DataStructureException{
-		
-		migrateData( Req3A );
-		
-		int featuresSize = redBlacktree.size();
-		ArrayNode<String, Integer> node;
-		ArrayList<ArrayNode<String, Integer>> features = new ArrayList<>(60);
-		
-		int quantityInRank = 0;
-		String minDateInRank = redBlacktree.min();
-		String maxDateInRank = addDate( minDateInRank, d );
-		
-		int timesRangeZero = 0;
-		
-		int j = 0;
-		for( int i = 0; i < featuresSize; i += quantityInRank ){
-			quantityInRank = redBlacktree.quantityOfValuesInRange(minDateInRank, maxDateInRank);
-			
-			if(quantityInRank==0){
-				timesRangeZero++;
-			}
-			else{
-				String key = minDateInRank + " - " + maxDateInRank;
-				node = new ArrayNode<String, Integer>(key, quantityInRank);
-				features.add(j, node);
-				j++;
-			}
-				
-			if((featuresSize/80) < timesRangeZero)
-				break;
-			
-			minDateInRank = addDate( maxDateInRank, 1);
-			maxDateInRank = addDate( minDateInRank, d);
-		}
-		System.out.println("search finished");
-		return features;
-		
-	}
-	
-	private String addDate( String dateString, int days ){
+	public boolean loadStreets(String verticesPath, String intersectionsPath){
 		
 		try{
-			DateFormat dateParser = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-			Date date = dateParser.parse(dateString);
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(date);
-			calendar.add(Calendar.DAY_OF_YEAR, days);
 			
-			return dateParser.format( calendar.getTime() );
+		  String str;
+		  FileReader f = new FileReader(verticesPath);
+		  BufferedReader b = new BufferedReader(f);
+		  while((str = b.readLine())!=null) {
+		      String[] line = str.split(",");
+		      String id = line[0];
+		      double longitud = Double.parseDouble(line[1]);
+		      double latitud = Double.parseDouble(line[2]);
+		      
+		      loadIntersection(id, new Intersection(longitud, latitud));
+		  }
+		  b.close();
+		  
+		  f = new FileReader(intersectionsPath);
+		  b = new BufferedReader(f);
+		  while((str = b.readLine())!=null) {
+			  if( !str.startsWith("#") ){
+			      String[] vertices = str.split(" ");
+			      loadEdge(vertices);
+			  }
+		  }
+		  b.close();
+		  
+		}catch (FileNotFoundException e) {
+			System.out.println("ERROR! Streets file not found\n\n");
+			return false;
 		}
-		catch( ParseException e ){
-			e.printStackTrace();
-			return "";
+		catch (IOException e) {
+			System.out.println("ERROR! Streets file IOException\n\n");
+			return false;
 		}
 		
+		return true;
 	}
 
-	
-	public void migrateData( String requirement ) throws DataStructureException{
-		
-		switch( requirement ){
-			case Req1A:
-				switch( dataStructureInUse ){
-					case MAXPQ:
-						priorityQueue.changeComparator( new SevereComparator<>() );
-						break;
-					case HASHMAP:
-						migrateDataFromHashToQueue(Req1A);
-						break;
-					case REDBLACKTREE:
-						migrateDataFromTreeToQueue(Req1A);
-						break;
-				}
-				break;
-			case Req2A:
-				switch( dataStructureInUse ){
-					case MAXPQ:
-						migrateDataFromQueueToHash(Req2A);
-						break;
-					case HASHMAP:
-						migrateDataFromHashToHash(Req2A);
-						break;
-					case REDBLACKTREE:
-						migrateDataFromTreeToHash(Req2A);
-						break;
-				}
-				break;
-			case Req3A:
-				switch( dataStructureInUse ){
-					case MAXPQ:
-						migrateDataFromQueueToTree(Req3A);
-						break;
-					case HASHMAP:
-						migrateDataFromoHashToTree(Req3A);
-						break;
-					case REDBLACKTREE:
-						migrateDataFromTreeToTree(Req3A);
-						break;
-				}
-				break;
-			case Req1B:
-				switch( dataStructureInUse ){
-					case MAXPQ:
-						priorityQueue.changeComparator( new NearComparator<>() );
-						break;
-					case HASHMAP:
-						migrateDataFromHashToQueue(Req1B);
-						break;
-					case REDBLACKTREE:
-						migrateDataFromTreeToQueue(Req1B);
-						break;
-				}
-				break;
-			case Req2B:
-				switch( dataStructureInUse ){
-					case MAXPQ:
-						migrateDataFromQueueToHash(Req2B);
-						break;
-					case HASHMAP:
-						migrateDataFromHashToHash(Req2B);
-						break;
-					case REDBLACKTREE:
-						migrateDataFromTreeToHash(Req2B);
-						break;
-				}
-				break;
-			case Req3B:
-				switch( dataStructureInUse ){
-					case MAXPQ:
-						migrateDataFromoHashToTree(Req3B);
-						break;
-					case HASHMAP:
-						migrateDataFromoHashToTree(Req3B);
-						break;
-					case REDBLACKTREE:
-						migrateDataFromTreeToTree(Req3B);
-						break;
-				}
-				break;
-		}
-		
-	}
-	
-	public void migrateDataFromQueueToHash( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(MAXPQ) )
-			throw new DataStructureException("Can't migrate from Queue because is empty");
-		
-		while( !priorityQueue.isEmpty() ){
-			Feature feature = priorityQueue.delMax();
-			String compoundKey = "";
-			
-			if( requirement.equals( Req2A ) ){
-				
-				Calendar calendar = Calendar.getInstance();
-				DateFormat format  = new SimpleDateFormat("yyyy-MM-dd");
-				Date date;
-				try {
-					date = format.parse(feature.getDate());
-					calendar.setTime(date);
-					String weekDay = Integer.toString( calendar.get(calendar.DAY_OF_WEEK) );
-					String month = Integer.toString( calendar.get(calendar.MONTH) );
-					
-					compoundKey = month + "-" + weekDay;
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-			
-			} else if( requirement.equals( Req2B ) ){
-				compoundKey = feature.getDetectionMethod() + "-" + feature.getVehicleClass()
-					+ "-" + feature.getServiceType() + "-" + feature.getLocality();
-			}
-			
-			hashMap.put(compoundKey, feature);
-		}
-		
-		dataStructureInUse = HASHMAP;
-	}
-	
-	public void migrateDataFromQueueToTree( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(MAXPQ) )
-			throw new DataStructureException("Can't migrate from Queue because is empty");
-		
-		while( !priorityQueue.isEmpty() ){
-			Feature feature = priorityQueue.delMax();
-			String key = "";
-			
-			if( requirement.equals( Req3A ) ){
-				
-				DateFormat parser  = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-				Date date;
-				try {
-					date = parser.parse(feature.getDate());
-					DateFormat formater = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-					key = formater.format(date);
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-			
-			} else if( requirement.equals( Req3B ) ){
-				key = Double.toString( feature.getLatitud() );
-			}
-			
-			redBlacktree.put(key, feature);
-		
-		}
-		
-		dataStructureInUse = REDBLACKTREE;
-	}
-	
-	public void migrateDataFromHashToQueue( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(HASHMAP) )
-			throw new DataStructureException("Can't migrate from Hash because is empty");
-
-		Comparator<Feature> comparator = requirement.equals( Req1A ) ? new SevereComparator<>() : null;
-		Comparator<Feature> comparator2 = requirement.equals( Req1B ) ? new NearComparator<>() : null;
-		
-		priorityQueue.changeComparator(comparator);
-		priorityQueue.changeComparator(comparator2);
-
-		IQueue<Feature>[] vals = hashMap.getValues();
-		
-		for( int i = 0; i < vals.length; i++ ){
-			IQueue<Feature> actValue = vals[i];
-			while( !actValue.isEmpty() )
-				priorityQueue.insert( actValue.dequeue() );
-			
-			vals[i] = null;
-		}
-		
-		// resizing hash
-		vals = (IQueue<Feature>[]) new Object[7];
-		
-		dataStructureInUse = MAXPQ;
-	}
-	
-	public void migrateDataFromoHashToTree( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(HASHMAP) )
-			throw new DataStructureException("Can't migrate from Hash because is empty");
-
-		IQueue<Feature>[] vals = hashMap.getValues();
-		
-		for( int i = 0; i < vals.length; i++ ){
-			
-			IQueue<Feature> actValue = vals[i] != null ? vals[i] : new Queue<>();
-			
-			while( !actValue.isEmpty()){
-				Feature feature = actValue.dequeue();
-				String key = "";
-				
-				if( requirement.equals( Req3A ) ){
-					
-					DateFormat parser  = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
-					Date date;
-					try {
-						date = parser.parse(feature.getDate());
-						DateFormat formater = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-						key = formater.format(date);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-				
-				} else if( requirement.equals( Req3B ) ){
-					key = Double.toString( feature.getLatitud() );
-				}
-				
-					
-				redBlacktree.put(key, feature);
-			}
-				
-			vals[i] = null;
-		}
-		
-		// resizing hash
-		vals = (IQueue<Feature>[]) new Object[7];
-		
-		dataStructureInUse = REDBLACKTREE;
-	}
-	
-	public void migrateDataFromHashToHash( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(HASHMAP) )
-			throw new DataStructureException("Can't migrate from Hash because is empty");
-		
-		IQueue<Feature>[] vals = hashMap.getValues();
-		ILinearProbing<String, Feature> newHashMap = new LinearProbingHash<>( vals.length );
-		
-		for( int i = 0; i < vals.length; i++ ){
-			
-			IQueue<Feature> actValue = vals[i];
-			
-			while( !actValue.isEmpty()){
-				Feature feature = actValue.dequeue();
-				String compoundKey = "";
-				
-				if( requirement.equals( Req2A ) ){
-					
-					Calendar calendar = Calendar.getInstance();
-					DateFormat format  = new SimpleDateFormat("yyyy-MM-dd");
-					Date date;
-					try {
-						date = format.parse(feature.getDate());
-						calendar.setTime(date);
-						String weekDay = Integer.toString( calendar.get(calendar.DAY_OF_WEEK) );
-						String month = Integer.toString( calendar.get(calendar.MONTH) );
-						
-						compoundKey = month + "-" + weekDay;
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-				
-				} else if( requirement.equals( Req2B ) ){
-					compoundKey = feature.getDetectionMethod() + "-" + feature.getVehicleClass()
-						+ "-" + feature.getServiceType() + "-" + feature.getLocality();
-				}
-				
-					
-				newHashMap.put(compoundKey, feature);
-			}
-				
-			vals[i] = null;
-		}
-		
-		// resizing hash
-		vals = (IQueue<Feature>[]) new Object[7];
-		
-		// changing hash
-		hashMap = newHashMap;
-		
-		dataStructureInUse = HASHMAP;
-		
-	}
-	
-	public void migrateDataFromTreeToTree( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(REDBLACKTREE) )
-			throw new DataStructureException("Can't migrate from Tree because is empty");
-		
-		Iterator<Feature> treeIterator = redBlacktree.valuesInRange( redBlacktree.min(), redBlacktree.max() );
-
-		redBlacktree.emptyTree();
-		
-		while( treeIterator.hasNext() ){
-			Feature featureVal = treeIterator.next();
-			
-			String key = "";
-			
-			if( requirement.equals( Req3A ) ){
-				
-				DateFormat parser  = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
-				Date date;
-				try {
-					date = parser.parse(featureVal.getDate());
-					DateFormat formater = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-					key = formater.format(date);
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-			
-			} else if( requirement.equals( Req3B ) ){
-				key = Double.toString( featureVal.getLatitud() );
-			}
-			
-			redBlacktree.put(key, featureVal);
-		}
-		
-		dataStructureInUse = REDBLACKTREE;
-	}
-	
-	public void migrateDataFromTreeToQueue( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(REDBLACKTREE) )
-			throw new DataStructureException("Can't migrate from Tree because is empty");
-		
-		Iterator<Feature> treeIterator = redBlacktree.valuesInRange( redBlacktree.min(), redBlacktree.max() );
-		
-		Comparator<Feature> comparator = requirement.equals( Req1A ) ? new SevereComparator<>() : null;
-		priorityQueue.changeComparator(comparator);
-		
-		while( treeIterator.hasNext() ){
-			Feature featureVal = treeIterator.next();
-			priorityQueue.insert(featureVal);
-		}
-		
-		redBlacktree.emptyTree();
-		
-		dataStructureInUse = MAXPQ;
-	}
-	
-	public void migrateDataFromTreeToHash( String requirement ) throws DataStructureException{
-		if( !dataStructureInUse.equals(REDBLACKTREE) )
-			throw new DataStructureException("Can't migrate from Tree because is empty");
-		
-		Iterator<Feature> treeIterator = redBlacktree.valuesInRange( redBlacktree.min(), redBlacktree.max() );
-		
-		while( treeIterator.hasNext() ){
-			Feature feature = treeIterator.next();	
-			String compoundKey = "";
-			
-			if( requirement.equals( Req2A ) ){
-				
-				Calendar calendar = Calendar.getInstance();
-				DateFormat format  = new SimpleDateFormat("yyyy-MM-dd");
-				Date date;
-				try {
-					date = format.parse(feature.getDate());
-					calendar.setTime(date);
-					String weekDay = Integer.toString( calendar.get(calendar.DAY_OF_WEEK) );
-					String month = Integer.toString( calendar.get(calendar.MONTH) );
-					
-					compoundKey = month + "-" + weekDay;
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-			
-			} else if( requirement.equals( Req2B ) ){
-				compoundKey = feature.getDetectionMethod() + "-" + feature.getVehicleClass()
-					+ "-" + feature.getServiceType() + "-" + feature.getLocality();
-			}
-			
-			hashMap.put(compoundKey, feature);
-		}
-		
-		redBlacktree.emptyTree();
-		
-		dataStructureInUse = HASHMAP;
-	}
-	
 	public boolean loadDataList(String path){
 		if( loadGson(path) )
 			return true;
@@ -684,7 +186,7 @@ public class Modelo {
 						elemServiceType, elemInfraction, elemInfractionReason, elemLocality, elemTown, elemGeomType,
 						elemCoordinates);
 
-				loadMapElement(feature);
+//				loadElement(feature);
 
 				if( featureWithBiggestId == null )
 					featureWithBiggestId = feature;
@@ -697,7 +199,7 @@ public class Modelo {
 				lastFeature = feature;
 			}
 
-			size = priorityQueue.size();
+//			size = priorityQueue.size();
 
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR! File not found\n\n");
@@ -708,12 +210,28 @@ public class Modelo {
 
 	}
 	
-	
-	private void loadMapElement(Feature feature){
-		
-		priorityQueue.insert(feature);
-		
+	private void loadIntersection(String id, Intersection inter){
+		graph.addVertex(id, inter);
 	}
+	
+	private void loadEdge(String[] adj){
+		String id = adj[0];
+		Intersection edge = graph.getInfoVertex(id);
+		
+		for( int i = 1; i < adj.length; i++ ){
+			Intersection actInter = graph.getInfoVertex(adj[i]);
+			double haversineDist = Haversine.distance(edge.getLatitud(), edge.getLongitud(),
+					actInter.getLatitud(), actInter.getLongitud());
+			
+			graph.addEdge(id, adj[i], haversineDist);			
+		}
+	}
+	
+//	private void loadElement(Feature feature){
+//		
+//		graph.addVertex(idVertex, feature);
+//		
+//	}
 
 
 }
