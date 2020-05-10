@@ -4,6 +4,6 @@
 
   201912575
 
-* Juan Andres Santiagito
+* Juan Andres Santiago
 
   201821950
