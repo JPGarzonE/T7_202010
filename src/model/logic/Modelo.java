@@ -232,12 +232,12 @@ public class Modelo {
 		}
 	}
 	
-<<<<<<< HEAD
+	
 	@SuppressWarnings("unchecked")
-	public void graphToJson()
+	public void graphToJson(double latitud, double longitud)
 	{
 		JSONObject obj = new JSONObject();
-		IUndirectedGraph ob = null;
+		Intersection V = new Intersection(longitud, latitud);
 		
 		JSONArray list = new JSONArray();
 
@@ -246,16 +246,16 @@ public class Modelo {
 		innerObjV.put("type","Point");
 		
 		JSONArray information = new JSONArray();
-		information.add("latitud");
-		information.add("longitud");
-		information.add("id");
+		information.add(latitud);
+		information.add(longitud);
+		information.add(V.getId());
 		innerObjV.put("informacion", information);
 		
 		Object vertice = obj.put("Vertex",innerObjV);
 		
 		JSONObject innerObjA = new JSONObject();
 		innerObjA.put("type", "Line");
-		innerObjA.put("distance", "harvesiana");
+		innerObjA.put("distance","haversiana"); 
 		
 		Object arco = obj.put("Arco",innerObjA );
 		
@@ -284,13 +284,7 @@ public class Modelo {
 			JsonReader reader = new JsonReader(new FileReader(path));
 			JsonElement featuresElement = JsonParser.parseReader(reader).getAsJsonObject().get("graphs");
 			JsonArray jsonFeaturesArray = featuresElement.getAsJsonArray();
-=======
-//	private void loadElement(Feature feature){
-//		
-//		graph.addVertex(idVertex, feature);
-//		
-//	}
->>>>>>> 2fecca0475e134784a4f580a65358f96bafb8a7d
+
 
 			for (JsonElement element : jsonFeaturesArray) {
 
@@ -308,20 +302,7 @@ public class Modelo {
 				JsonElement elemArc = element.getAsJsonObject().get("Arc");
 				String elemArcType = elemArc.getAsJsonObject().get("Type").getAsString();
 				int elemDistance = elemArc.getAsJsonObject().get("Distance").getAsInt();
-				
-				//Feature feature = new Feature();
 
-				//loadMapElement(feature);
-
-				//if( featureWithBiggestId == null )
-					//featureWithBiggestId = feature;
-				//else if( featureWithBiggestId.getObjectId() < feature.getObjectId() )
-					//featureWithBiggestId = feature;
-				
-				//if( firstFeature == null )
-					//firstFeature = feature;
-				
-				//lastFeature = feature;
 			}
 
 		} catch (FileNotFoundException e) {

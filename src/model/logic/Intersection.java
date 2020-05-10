@@ -5,6 +5,8 @@ public class Intersection {
 	private double longitud;
 	
 	private double latitud;
+	
+	private int id;
 
 	public Intersection(double longitud, double latitud){
 		this.longitud = longitud;
@@ -25,6 +27,14 @@ public class Intersection {
 
 	public void setLatitud(double latitud) {
 		this.latitud = latitud;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 }
