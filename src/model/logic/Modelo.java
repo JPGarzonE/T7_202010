@@ -2,6 +2,8 @@ package model.logic;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,13 +11,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import Exception.DataStructureException;
 import model.data_structures.ArrayNode;
@@ -23,6 +28,7 @@ import model.data_structures.ILinearProbing;
 import model.data_structures.IMaxPQ;
 import model.data_structures.IQueue;
 import model.data_structures.IRedBlackBST;
+import model.data_structures.IUndirectedGraph;
 import model.data_structures.LinearProbingHash;
 import model.data_structures.MaxPQ;
 import model.data_structures.Queue;
@@ -714,6 +720,97 @@ public class Modelo {
 		priorityQueue.insert(feature);
 		
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void graphToJson()
+	{
+		JSONObject obj = new JSONObject();
+		IUndirectedGraph ob = null;
+		
+		JSONArray list = new JSONArray();
+
+		
+		JSONObject innerObjV = new JSONObject();
+		innerObjV.put("type","Point");
+		
+		JSONArray information = new JSONArray();
+		information.add("latitud");
+		information.add("longitud");
+		information.add("id");
+		innerObjV.put("informacion", information);
+		
+		Object vertice = obj.put("Vertex",innerObjV);
+		
+		JSONObject innerObjA = new JSONObject();
+		innerObjA.put("type", "Line");
+		innerObjA.put("distance", "harvesiana");
+		
+		Object arco = obj.put("Arco",innerObjA );
+		
+		list.add(vertice);
+		list.add(arco);
+		obj.put("graphs", list);
+		try {
+
+			FileWriter file = new FileWriter("c:\\graphs.json");
+			file.write(obj.toJSONString());
+			file.flush();
+			file.close();
+
+		} catch (IOException e) {
+			//manejar error
+		}
+
+		System.out.print(obj);
+
+	}
+	
+	private boolean loadGsonGraph(String path) {
+
+		try {
+			System.out.println(path);
+			JsonReader reader = new JsonReader(new FileReader(path));
+			JsonElement featuresElement = JsonParser.parseReader(reader).getAsJsonObject().get("graphs");
+			JsonArray jsonFeaturesArray = featuresElement.getAsJsonArray();
+
+			for (JsonElement element : jsonFeaturesArray) {
 
 
+				JsonElement elemVertex = element.getAsJsonObject().get("Vertex");
+				String elemVertType = elemVertex.getAsJsonObject().get("Type").getAsString();
+				JsonArray elemGeomCoordinates = elemVertex.getAsJsonObject().get("Coordinates").getAsJsonArray();
+				ArrayList<Double> elemCoordinates = new ArrayList<Double>();
+
+				for (JsonElement elemCoord : elemGeomCoordinates) {
+					Double actualCoord = elemCoord.getAsDouble();
+					elemCoordinates.add(actualCoord);
+				}
+
+				JsonElement elemArc = element.getAsJsonObject().get("Arc");
+				String elemArcType = elemArc.getAsJsonObject().get("Type").getAsString();
+				int elemDistance = elemArc.getAsJsonObject().get("Distance").getAsInt();
+				
+				//Feature feature = new Feature();
+
+				//loadMapElement(feature);
+
+				//if( featureWithBiggestId == null )
+					//featureWithBiggestId = feature;
+				//else if( featureWithBiggestId.getObjectId() < feature.getObjectId() )
+					//featureWithBiggestId = feature;
+				
+				//if( firstFeature == null )
+					//firstFeature = feature;
+				
+				//lastFeature = feature;
+			}
+
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR! File not found\n\n");
+			return false;
+		}
+		
+		return true;
+
+	}
 }
