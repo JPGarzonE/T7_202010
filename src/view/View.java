@@ -21,15 +21,7 @@ public class View
 		public void printMenu()
 		{
 			System.out.println("1. (Req1A) - Obtener los M comparendos con mayor gravedad");
-			System.out.println("2. (Req2A) - Buscar los comparendos por mes y día de la semana");
-			System.out.println("3. (Req3A) - Buscar los comparendos en un rango por fecha-hora y localidad");
-			System.out.println("4. (Req1B) - Buscar los M comparendos más cercanos a la estación de polic�a");
-			System.out.println("5. (Req2B) - Buscar los comparendos por medio de detecci�n, clase de vehículo, tipo de servicio y localidad");
-			System.out.println("6. (Req3B) - Buscar los comparendos en un rango por latitud y tipo de vehículo");
-			System.out.println("7. (Req1C) - Visualizar Datos en una Tabla ASCII");
-			System.out.println("8. (Req2C) - El costo de los tiempos de espera hoy en día");
-			System.out.println("9. (Req3C) - El costo de los tiempos de espera usando el nuevo sistema");
-			System.out.println("10. Exit");
+			System.out.println("2. Exit");
 			System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
 		}
 
@@ -56,15 +48,13 @@ public class View
 			
 		}
 		
-		public void printGeneralFeaturesInfo(int featuresNumber, Feature featureBiggestId){
+		public void printGeneralFeaturesInfo(int edgesSize, int vertexSize){
 			
 			System.out.println("\nDATOS GENERALES:");
 			System.out.println("\n-----------------------------------");
 			
-			System.out.println("\nNUMERO TOTAL DE COMPARENDOS: " + featuresNumber);
-			
-			System.out.println("\n\nCOMPARENDO CON MAYOR ID:");
-			printFeature(featureBiggestId);
+			System.out.println("\nNUMERO TOTAL DE VERTICES: " + vertexSize);
+			System.out.println("\nNUMERO TOTAL DE ARCOS: " + edgesSize);
 						
 		}
 		
